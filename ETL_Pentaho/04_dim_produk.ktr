@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>04_dim_produk</name>
+    <description>Dimensi produk SCD Tipe 2 dari riwayat harga pokok S4 produk_master.csv</description>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
+    <directory>/</directory>
+    <parameters>
+    </parameters>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <created_user>-</created_user>
+    <created_date>2026/10/25 12:00:00.000</created_date>
+    <modified_user>-</modified_user>
+    <modified_date>2026/10/25 12:00:00.000</modified_date>
+    <is_key_private>N</is_key_private>
+  </info>
+  <notepads>
+    <notepad>
+      <note>SCD Tipe 2: satu material_no dapat punya beberapa versi harga pokok.
+berlaku_sampai = (berlaku_sejak versi berikutnya - 1 hari); versi terakhir = 9999-12-31.
+Saat load fakta, harga pokok diambil dari versi dengan berlaku_sejak &lt;= tanggal transaksi &lt;= berlaku_sampai.</note>
+      <xloc>60</xloc>
+      <yloc>0</yloc>
+      <width>620</width>
+      <heigth>55</heigth>
+      <fontname>Segoe UI</fontname>
+      <fontsize>9</fontsize>
+      <fontbold>N</fontbold>
+      <fontitalic>N</fontitalic>
+      <fontcolorred>0</fontcolorred>
+      <fontcolorgreen>0</fontcolorgreen>
+      <fontcolorblue>0</fontcolorblue>
+      <backgroundcolorred>255</backgroundcolorred>
+      <backgroundcolorgreen>244</backgroundcolorgreen>
+      <backgroundcolorblue>204</backgroundcolorblue>
+      <bordercolorred>100</bordercolorred>
+      <bordercolorgreen>100</bordercolorgreen>
+      <bordercolorblue>100</bordercolorblue>
+      <drawshadow>N</drawshadow>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>conn_nrg_ecom</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>nrg_ecom</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes><attribute><code>EXTRA_OPTION_MYSQL.useSSL</code><attribute>false</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.allowPublicKeyRetrieval</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.characterEncoding</code><attribute>UTF-8</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute><attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute><attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute><attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute><attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute><attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>USE_POOLING</code><attribute>N</attribute></attribute></attributes>
+  </connection>
+  <connection>
+    <name>conn_nrg_dw</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>nrg_dw</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes><attribute><code>EXTRA_OPTION_MYSQL.useSSL</code><attribute>false</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.allowPublicKeyRetrieval</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.characterEncoding</code><attribute>UTF-8</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.createDatabaseIfNotExist</code><attribute>true</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute><attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute><attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute><attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute><attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute><attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>USE_POOLING</code><attribute>N</attribute></attribute></attributes>
+  </connection>
+  <order>
+    <hop>
+      <from>Baca produk_master.csv (S4)</from>
+      <to>Urutkan material + berlaku_sejak</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Urutkan material + berlaku_sejak</from>
+      <to>Ambil berlaku_sejak versi berikutnya (LEAD)</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Ambil berlaku_sejak versi berikutnya (LEAD)</from>
+      <to>Nomor versi per material</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Nomor versi per material</from>
+      <to>Hitung berlaku_sampai &amp; is_current</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Hitung berlaku_sampai &amp; is_current</from>
+      <to>Lookup pemasok_key</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Lookup pemasok_key</from>
+      <to>Tulis dim_produk</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+  <step>
+    <name>Baca produk_master.csv (S4)</name>
+    <type>TextFileInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <accept_filenames>N</accept_filenames>
+    <passing_through_fields>N</passing_through_fields>
+    <accept_field/>
+    <accept_stepname/>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar/>
+    <header>Y</header>
+    <nr_headerlines>1</nr_headerlines>
+    <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>mixed</format>
+    <encoding>UTF-8</encoding>
+    <length>Characters</length>
+    <add_to_result_filenames>N</add_to_result_filenames>
+    <file>
+      <name>${Internal.Entry.Current.Directory}/../Data_Sumber/S4_ERP_MASTER/produk_master.csv</name>
+      <filemask/>
+      <exclude_filemask/>
+      <file_required>Y</file_required>
+      <include_subfolders>N</include_subfolders>
+      <type>CSV</type>
+      <compression>None</compression>
+    </file>
+    <filters>
+    </filters>
+    <fields><field><name>material_no</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>nama_produk</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>brand</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>kategori</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>sub_kategori</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>harga_pokok</name><type>Number</type><format>#.##</format><currency/><decimal>.</decimal><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>supplier</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>status</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>berlaku_sejak</name><type>Date</type><format>yyyy-MM-dd</format><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field></fields>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <skip_bad_files>N</skip_bad_files>
+    <file_error_field/>
+    <file_error_message_field/>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>N</date_format_lenient>
+    <date_format_locale>en_US</date_format_locale>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>60</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Urutkan material + berlaku_sejak</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields><field><name>material_no</name><ascending>Y</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field><field><name>berlaku_sejak</name><ascending>Y</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>250</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Ambil berlaku_sejak versi berikutnya (LEAD)</name>
+    <type>AnalyticQuery</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <group><field><name>material_no</name></field></group>
+    <fields><field><aggregate>berlaku_berikutnya</aggregate><subject>berlaku_sejak</subject><type>LEAD</type><valuefield>1</valuefield></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>440</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Nomor versi per material</name>
+    <type>FieldsChangeSequence</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <start>1</start>
+    <increment>1</increment>
+    <resultfieldName>versi</resultfieldName>
+    <fields><field><name>material_no</name></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>630</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Hitung berlaku_sampai &amp; is_current</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+// versi berlaku s.d. sehari sebelum versi berikutnya; versi terakhir terbuka s.d. 9999-12-31
+var berlaku_sampai = berlaku_berikutnya == null ? str2date('9999-12-31', 'yyyy-MM-dd') : dateAdd(berlaku_berikutnya, 'd', -1);
+var is_current = berlaku_berikutnya == null ? 1 : 0;
+var material_no_std = upperStr(material_no);
+var nama_produk_std = trimStr(nama_produk);
+var merk = trimStr(brand);
+var kategori_std = trimStr(kategori);
+var sub_kategori_std = trimStr(sub_kategori);
+var status_produk = upperStr(status);
+var nama_pemasok = trimStr(supplier);
+var is_inferred = 0;
+var sumber_data = 'ERP S4';
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>berlaku_sampai</name><rename>berlaku_sampai</rename><type>Date</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>is_current</name><rename>is_current</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>material_no_std</name><rename>material_no_std</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nama_produk_std</name><rename>nama_produk_std</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>merk</name><rename>merk</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kategori_std</name><rename>kategori_std</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>sub_kategori_std</name><rename>sub_kategori_std</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>status_produk</name><rename>status_produk</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nama_pemasok</name><rename>nama_pemasok</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>is_inferred</name><rename>is_inferred</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>sumber_data</name><rename>sumber_data</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>820</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Lookup pemasok_key</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_pemasok</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key><name>nama_pemasok</name><field>nama_pemasok</field><condition>=</condition><name2/></key>
+      <value><name>pemasok_key</name><rename>pemasok_key</rename><default>-1</default><type>Integer</type></value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1010</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Tulis dim_produk</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <schema/>
+    <table>dim_produk</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields><field><column_name>material_no</column_name><stream_name>material_no_std</stream_name></field><field><column_name>nama_produk</column_name><stream_name>nama_produk_std</stream_name></field><field><column_name>merk</column_name><stream_name>merk</stream_name></field><field><column_name>kategori</column_name><stream_name>kategori_std</stream_name></field><field><column_name>sub_kategori</column_name><stream_name>sub_kategori_std</stream_name></field><field><column_name>harga_pokok</column_name><stream_name>harga_pokok</stream_name></field><field><column_name>status_produk</column_name><stream_name>status_produk</stream_name></field><field><column_name>pemasok_key</column_name><stream_name>pemasok_key</stream_name></field><field><column_name>nama_pemasok</column_name><stream_name>nama_pemasok</stream_name></field><field><column_name>versi</column_name><stream_name>versi</stream_name></field><field><column_name>berlaku_sejak</column_name><stream_name>berlaku_sejak</stream_name></field><field><column_name>berlaku_sampai</column_name><stream_name>berlaku_sampai</stream_name></field><field><column_name>is_current</column_name><stream_name>is_current</stream_name></field><field><column_name>is_inferred</column_name><stream_name>is_inferred</stream_name></field><field><column_name>sumber_data</column_name><stream_name>sumber_data</stream_name></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1200</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step_error_handling>
+  </step_error_handling>
+  <slave-step-copy-partition-distribution>
+  </slave-step-copy-partition-distribution>
+  <slave_transformation>N</slave_transformation>
+</transformation>

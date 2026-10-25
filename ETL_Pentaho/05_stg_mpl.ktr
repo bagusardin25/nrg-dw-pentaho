@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>05_stg_mpl</name>
+    <description>Ekstrak JSON marketplace (S3): ratakan items[], deduplikasi retry API, alokasi fee per item</description>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
+    <directory>/</directory>
+    <parameters>
+    </parameters>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <created_user>-</created_user>
+    <created_date>2026/10/25 12:00:00.000</created_date>
+    <modified_user>-</modified_user>
+    <modified_date>2026/10/25 12:00:00.000</modified_date>
+    <is_key_private>N</is_key_private>
+  </info>
+  <notepads>
+    <notepad>
+      <note>S3 MPL_API: JSON bersarang invoice -&gt; items[] -&gt; fees.
+1) items[] diratakan menjadi 1 baris per item.  2) paid_at (UTC) + 7 jam = WIB.
+3) ~2% invoice terduplikasi (retry API): dedup per invoice+seller_sku, ambil diambil_pada terakhir;
+    baris duplikat dicatat ke stg_mpl_duplikat.  4) fee per invoice dialokasikan proporsional nilai item.</note>
+      <xloc>60</xloc>
+      <yloc>0</yloc>
+      <width>700</width>
+      <heigth>60</heigth>
+      <fontname>Segoe UI</fontname>
+      <fontsize>9</fontsize>
+      <fontbold>N</fontbold>
+      <fontitalic>N</fontitalic>
+      <fontcolorred>0</fontcolorred>
+      <fontcolorgreen>0</fontcolorgreen>
+      <fontcolorblue>0</fontcolorblue>
+      <backgroundcolorred>255</backgroundcolorred>
+      <backgroundcolorgreen>244</backgroundcolorgreen>
+      <backgroundcolorblue>204</backgroundcolorblue>
+      <bordercolorred>100</bordercolorred>
+      <bordercolorgreen>100</bordercolorgreen>
+      <bordercolorblue>100</bordercolorblue>
+      <drawshadow>N</drawshadow>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>conn_nrg_ecom</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>nrg_ecom</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes><attribute><code>EXTRA_OPTION_MYSQL.useSSL</code><attribute>false</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.allowPublicKeyRetrieval</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.characterEncoding</code><attribute>UTF-8</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute><attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute><attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute><attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute><attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute><attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>USE_POOLING</code><attribute>N</attribute></attribute></attributes>
+  </connection>
+  <connection>
+    <name>conn_nrg_dw</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>nrg_dw</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes><attribute><code>EXTRA_OPTION_MYSQL.useSSL</code><attribute>false</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.allowPublicKeyRetrieval</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.characterEncoding</code><attribute>UTF-8</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.createDatabaseIfNotExist</code><attribute>true</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute><attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute><attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute><attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute><attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute><attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>USE_POOLING</code><attribute>N</attribute></attribute></attributes>
+  </connection>
+  <order>
+    <hop>
+      <from>Baca JSON mpl_pull_page_*.json (invoice)</from>
+      <to>Pecah items[] per baris item</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Pecah items[] per baris item</from>
+      <to>Konversi teks -&gt; tanggal</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Konversi teks -&gt; tanggal</from>
+      <to>UTC -&gt; WIB (+7 jam) &amp; nilai baris</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>UTC -&gt; WIB (+7 jam) &amp; nilai baris</from>
+      <to>Urutkan invoice, sku, diambil_pada DESC</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Urutkan invoice, sku, diambil_pada DESC</from>
+      <to>Dedup invoice+seller_sku (ambil tarikan terakhir)</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Dedup invoice+seller_sku (ambil tarikan terakhir)</from>
+      <to>Total nilai per invoice</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Total nilai per invoice</from>
+      <to>Alokasi fee proporsional</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Alokasi fee proporsional</from>
+      <to>Tulis stg_mpl_item</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Dedup invoice+seller_sku (ambil tarikan terakhir)</from>
+      <to>Tulis jejak duplikat</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+  <step>
+    <name>Baca JSON mpl_pull_page_*.json (invoice)</name>
+    <type>JsonInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <include>Y</include>
+    <include_field>sumber_file</include_field>
+    <rownum>N</rownum>
+    <addresultfile>N</addresultfile>
+    <readurl>N</readurl>
+    <removeSourceField>N</removeSourceField>
+    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
+    <doNotFailIfNoFile>N</doNotFailIfNoFile>
+    <ignoreMissingPath>Y</ignoreMissingPath>
+    <defaultPathLeafToNull>Y</defaultPathLeafToNull>
+    <rownum_field/>
+    <file>
+      <name>${Internal.Entry.Current.Directory}/../Data_Sumber/S3_MPL_API</name>
+      <filemask>mpl_pull_page_[0-9]+\.json</filemask>
+      <exclude_filemask/>
+      <file_required>Y</file_required>
+      <include_subfolders>N</include_subfolders>
+    </file>
+    <fields><field><name>invoice</name><path>$.records[*].invoice</path><type>String</type><format/><currency/><decimal>.</decimal><group/><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>paid_at_str</name><path>$.records[*].paid_at</path><type>String</type><format/><currency/><decimal>.</decimal><group/><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>channel</name><path>$.records[*].channel</path><type>String</type><format/><currency/><decimal>.</decimal><group/><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>buyer_hash</name><path>$.records[*].buyer.hash</path><type>String</type><format/><currency/><decimal>.</decimal><group/><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>buyer_city</name><path>$.records[*].buyer.city</path><type>String</type><format/><currency/><decimal>.</decimal><group/><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>fee_commission_inv</name><path>$.records[*].fees.commission</path><type>Number</type><format/><currency/><decimal>.</decimal><group/><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>fee_service_inv</name><path>$.records[*].fees.service</path><type>Number</type><format/><currency/><decimal>.</decimal><group/><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>diambil_pada_str</name><path>$.records[*].diambil_pada</path><type>String</type><format/><currency/><decimal>.</decimal><group/><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>items_json</name><path>$.records[*].items</path><type>String</type><format/><currency/><decimal>.</decimal><group/><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field></fields>
+    <limit>0</limit>
+    <IsInFields>N</IsInFields>
+    <IsAFile>N</IsAFile>
+    <valueField/>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>60</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Pecah items[] per baris item</name>
+    <type>JsonInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <addresultfile>N</addresultfile>
+    <readurl>N</readurl>
+    <removeSourceField>Y</removeSourceField>
+    <IsIgnoreEmptyFile>N</IsIgnoreEmptyFile>
+    <doNotFailIfNoFile>N</doNotFailIfNoFile>
+    <ignoreMissingPath>Y</ignoreMissingPath>
+    <defaultPathLeafToNull>Y</defaultPathLeafToNull>
+    <rownum_field/>
+    <fields><field><name>seller_sku</name><path>$[*].seller_sku</path><type>String</type><format/><currency/><decimal>.</decimal><group/><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>qty</name><path>$[*].qty</path><type>Integer</type><format/><currency/><decimal>.</decimal><group/><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>price</name><path>$[*].price</path><type>Number</type><format/><currency/><decimal>.</decimal><group/><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>voucher</name><path>$[*].voucher</path><type>Number</type><format/><currency/><decimal>.</decimal><group/><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field></fields>
+    <limit>0</limit>
+    <IsInFields>Y</IsInFields>
+    <IsAFile>N</IsAFile>
+    <valueField>items_json</valueField>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>250</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Konversi teks -&gt; tanggal</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields><select_unspecified>N</select_unspecified><meta><name>paid_at_str</name><rename>paid_at_utc</rename><type>Date</type><length>-2</length><precision>-2</precision><storage_type/><conversion_mask>yyyy-MM-dd'T'HH:mm:ss'Z'</conversion_mask><date_format_lenient>false</date_format_lenient><date_format_locale>en_US</date_format_locale><date_format_timezone/><lenient_string_to_number>false</lenient_string_to_number><encoding/><decimal_symbol/><grouping_symbol/><currency_symbol/></meta><meta><name>diambil_pada_str</name><rename>diambil_pada</rename><type>Date</type><length>-2</length><precision>-2</precision><storage_type/><conversion_mask>yyyy-MM-dd'T'HH:mm:ss</conversion_mask><date_format_lenient>false</date_format_lenient><date_format_locale>en_US</date_format_locale><date_format_timezone/><lenient_string_to_number>false</lenient_string_to_number><encoding/><decimal_symbol/><grouping_symbol/><currency_symbol/></meta></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>440</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>UTC -&gt; WIB (+7 jam) &amp; nilai baris</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+var waktu_wib = dateAdd(paid_at_utc, 'hh', 7);
+var seller_sku_std = upperStr(seller_sku);
+var nilai_baris_incl = num(qty) * num(price);
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>waktu_wib</name><rename>waktu_wib</rename><type>Date</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>seller_sku_std</name><rename>seller_sku_std</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nilai_baris_incl</name><rename>nilai_baris_incl</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>630</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Urutkan invoice, sku, diambil_pada DESC</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields><field><name>invoice</name><ascending>Y</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field><field><name>seller_sku_std</name><ascending>Y</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field><field><name>diambil_pada</name><ascending>N</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>820</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Dedup invoice+seller_sku (ambil tarikan terakhir)</name>
+    <type>Unique</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <count_rows>N</count_rows>
+    <count_field/>
+    <reject_duplicate_row>Y</reject_duplicate_row>
+    <error_description>Duplikat retry API: invoice+seller_sku sudah ada dengan diambil_pada lebih akhir</error_description>
+    <fields><field><name>invoice</name><case_insensitive>N</case_insensitive></field><field><name>seller_sku_std</name><case_insensitive>N</case_insensitive></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1010</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Tulis jejak duplikat</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <schema/>
+    <table>stg_mpl_duplikat</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields><field><column_name>invoice</column_name><stream_name>invoice</stream_name></field><field><column_name>seller_sku</column_name><stream_name>seller_sku_std</stream_name></field><field><column_name>diambil_pada</column_name><stream_name>diambil_pada</stream_name></field><field><column_name>sumber_file</column_name><stream_name>sumber_file</stream_name></field><field><column_name>keterangan</column_name><stream_name>keterangan</stream_name></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1010</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Total nilai per invoice</name>
+    <type>GroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <all_rows>Y</all_rows>
+    <ignore_aggregate>N</ignore_aggregate>
+    <field_ignore/>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>grp</prefix>
+    <add_linenr>N</add_linenr>
+    <linenr_fieldname/>
+    <give_back_row>N</give_back_row>
+    <group><field><name>invoice</name></field></group>
+    <fields><field><aggregate>nilai_invoice_incl</aggregate><subject>nilai_baris_incl</subject><type>SUM</type><valuefield/></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1200</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Alokasi fee proporsional</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+// fee commission &amp; service dicatat per invoice -&gt; dialokasikan sesuai porsi nilai baris item
+var porsi_alokasi = nilai_invoice_incl &gt; 0 ? nilai_baris_incl / nilai_invoice_incl : 0;
+var fee_commission_alok = r2(num(fee_commission_inv) * porsi_alokasi);
+var fee_service_alok = r2(num(fee_service_inv) * porsi_alokasi);
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>porsi_alokasi</name><rename>porsi_alokasi</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>fee_commission_alok</name><rename>fee_commission_alok</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>fee_service_alok</name><rename>fee_service_alok</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1390</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Tulis stg_mpl_item</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <schema/>
+    <table>stg_mpl_item</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields><field><column_name>invoice</column_name><stream_name>invoice</stream_name></field><field><column_name>seller_sku</column_name><stream_name>seller_sku_std</stream_name></field><field><column_name>channel</column_name><stream_name>channel</stream_name></field><field><column_name>buyer_hash</column_name><stream_name>buyer_hash</stream_name></field><field><column_name>buyer_city</column_name><stream_name>buyer_city</stream_name></field><field><column_name>paid_at_utc</column_name><stream_name>paid_at_utc</stream_name></field><field><column_name>waktu_wib</column_name><stream_name>waktu_wib</stream_name></field><field><column_name>diambil_pada</column_name><stream_name>diambil_pada</stream_name></field><field><column_name>qty</column_name><stream_name>qty</stream_name></field><field><column_name>price_incl_ppn</column_name><stream_name>price</stream_name></field><field><column_name>voucher_incl_ppn</column_name><stream_name>voucher</stream_name></field><field><column_name>nilai_baris_incl</column_name><stream_name>nilai_baris_incl</stream_name></field><field><column_name>nilai_invoice_incl</column_name><stream_name>nilai_invoice_incl</stream_name></field><field><column_name>porsi_alokasi</column_name><stream_name>porsi_alokasi</stream_name></field><field><column_name>fee_commission_inv</column_name><stream_name>fee_commission_inv</stream_name></field><field><column_name>fee_service_inv</column_name><stream_name>fee_service_inv</stream_name></field><field><column_name>fee_commission_alok</column_name><stream_name>fee_commission_alok</stream_name></field><field><column_name>fee_service_alok</column_name><stream_name>fee_service_alok</stream_name></field><field><column_name>sumber_file</column_name><stream_name>sumber_file</stream_name></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1580</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step_error_handling>
+    <error>
+      <source_step>Dedup invoice+seller_sku (ambil tarikan terakhir)</source_step>
+      <target_step>Tulis jejak duplikat</target_step>
+      <is_enabled>Y</is_enabled>
+      <nr_valuename/>
+      <descriptions_valuename>keterangan</descriptions_valuename>
+      <fields_valuename/>
+      <codes_valuename/>
+      <max_errors/>
+      <max_pct_errors/>
+      <min_pct_rows/>
+    </error>
+  </step_error_handling>
+  <slave-step-copy-partition-distribution>
+  </slave-step-copy-partition-distribution>
+  <slave_transformation>N</slave_transformation>
+</transformation>

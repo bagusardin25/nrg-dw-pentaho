@@ -1,0 +1,1204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>06_map_produk</name>
+    <description>Tabel pemetaan produk S1/S2/S3 -&gt; material_no S4 + inferred member (late arriving dimension)</description>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
+    <directory>/</directory>
+    <parameters>
+    </parameters>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <created_user>-</created_user>
+    <created_date>2026/10/25 12:00:00.000</created_date>
+    <modified_user>-</modified_user>
+    <modified_date>2026/10/25 12:00:00.000</modified_date>
+    <is_key_private>N</is_key_private>
+  </info>
+  <notepads>
+    <notepad>
+      <note>Tabel pemetaan produk: SKU S1, item_code S2, seller_sku S3 -&gt; satu material_no S4.
+Produk yang belum ada di ERP (ORD-9999 / SKU-NEWARR-001) = late arriving dimension -&gt; inferred member.</note>
+      <xloc>60</xloc>
+      <yloc>0</yloc>
+      <width>620</width>
+      <heigth>45</heigth>
+      <fontname>Segoe UI</fontname>
+      <fontsize>9</fontsize>
+      <fontbold>N</fontbold>
+      <fontitalic>N</fontitalic>
+      <fontcolorred>0</fontcolorred>
+      <fontcolorgreen>0</fontcolorgreen>
+      <fontcolorblue>0</fontcolorblue>
+      <backgroundcolorred>255</backgroundcolorred>
+      <backgroundcolorgreen>244</backgroundcolorgreen>
+      <backgroundcolorblue>204</backgroundcolorblue>
+      <bordercolorred>100</bordercolorred>
+      <bordercolorgreen>100</bordercolorgreen>
+      <bordercolorblue>100</bordercolorblue>
+      <drawshadow>N</drawshadow>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>conn_nrg_ecom</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>nrg_ecom</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes><attribute><code>EXTRA_OPTION_MYSQL.useSSL</code><attribute>false</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.allowPublicKeyRetrieval</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.characterEncoding</code><attribute>UTF-8</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute><attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute><attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute><attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute><attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute><attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>USE_POOLING</code><attribute>N</attribute></attribute></attributes>
+  </connection>
+  <connection>
+    <name>conn_nrg_dw</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>nrg_dw</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes><attribute><code>EXTRA_OPTION_MYSQL.useSSL</code><attribute>false</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.allowPublicKeyRetrieval</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.characterEncoding</code><attribute>UTF-8</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.createDatabaseIfNotExist</code><attribute>true</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute><attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute><attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute><attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute><attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute><attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>USE_POOLING</code><attribute>N</attribute></attribute></attributes>
+  </connection>
+  <order>
+    <hop>
+      <from>S1 katalog produk ECOM</from>
+      <to>S1 turunkan material_no dari SKU</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>S1 turunkan material_no dari SKU</from>
+      <to>S1 cek di master ERP</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>S1 cek di master ERP</from>
+      <to>S1 status pemetaan</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>S1 status pemetaan</from>
+      <to>S1 tulis map_produk</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>S1 status pemetaan</from>
+      <to>Belum ada di ERP?</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Belum ada di ERP?</from>
+      <to>Bangun inferred member</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Bangun inferred member</from>
+      <to>Tulis inferred ke dim_produk</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Belum ada di ERP?</from>
+      <to>Sudah ada di ERP</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>S2 product_master_local.csv</from>
+      <to>S2 kandidat material_no</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>S2 kandidat material_no</from>
+      <to>S2 cek di master ERP</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>S2 cek di master ERP</from>
+      <to>S2 status pemetaan</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>S2 status pemetaan</from>
+      <to>S2 tulis map_produk</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>S3 seller_sku unik (staging)</from>
+      <to>S3 turunkan material_no dari seller_sku</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>S3 turunkan material_no dari seller_sku</from>
+      <to>S3 cek di master ERP</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>S3 cek di master ERP</from>
+      <to>S3 status pemetaan</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>S3 status pemetaan</from>
+      <to>S3 tulis map_produk</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+  <step>
+    <name>S1 katalog produk ECOM</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_ecom</connection>
+    <sql>SELECT p.product_id, p.sku, p.product_name, p.brand,
+       c.category_name  AS sub_kategori_ecom,
+       pc.category_name AS kategori_ecom
+FROM products p
+LEFT JOIN categories c  ON c.category_id  = p.category_id
+LEFT JOIN categories pc ON pc.category_id = c.parent_category_id</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>60</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>S1 turunkan material_no dari SKU</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+// pola SKU ECOM: SKU-&lt;4 digit nomor material&gt;-&lt;sufiks acak&gt;  -&gt;  P-&lt;4 digit&gt;
+var sumber = 'S1';
+var m = String(upperStr(sku)).match(/^SKU-(\d{4})-\d+$/);
+var kandidat_material = m != null ? 'P-' + m[1] : null;
+var nama_produk_sumber = trimStr(product_name);
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>sumber</name><rename>sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kandidat_material</name><rename>kandidat_material</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nama_produk_sumber</name><rename>nama_produk_sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>250</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>S1 cek di master ERP</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_produk</table>
+      <orderby>versi</orderby>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key><name>kandidat_material</name><field>material_no</field><condition>=</condition><name2/></key>
+      <value><name>nama_produk</name><rename>nama_erp</rename><default/><type>String</type></value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>440</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>S1 status pemetaan</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>N</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+var kode_produk_sumber = upperStr(sku);
+var material_no_map = null;
+var status_pemetaan = null;
+var metode_pemetaan = null;
+if (nama_erp != null) {
+  material_no_map = kandidat_material;
+  status_pemetaan = 'TERPETAKAN';
+  metode_pemetaan = 'Pola SKU-nnnn-xxx -&gt; P-nnnn';
+} else {
+  material_no_map = 'INF-' + kode_produk_sumber;
+  status_pemetaan = 'LATE ARRIVING';
+  metode_pemetaan = 'Belum terdaftar di master ERP (S4): dibuat inferred member';
+}
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>kode_produk_sumber</name><rename>kode_produk_sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>material_no_map</name><rename>material_no_map</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>status_pemetaan</name><rename>status_pemetaan</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>metode_pemetaan</name><rename>metode_pemetaan</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>630</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>S1 tulis map_produk</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <schema/>
+    <table>map_produk</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields><field><column_name>sumber</column_name><stream_name>sumber</stream_name></field><field><column_name>kode_produk_sumber</column_name><stream_name>kode_produk_sumber</stream_name></field><field><column_name>nama_produk_sumber</column_name><stream_name>nama_produk_sumber</stream_name></field><field><column_name>material_no</column_name><stream_name>material_no_map</stream_name></field><field><column_name>status_pemetaan</column_name><stream_name>status_pemetaan</stream_name></field><field><column_name>metode_pemetaan</column_name><stream_name>metode_pemetaan</stream_name></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>820</xloc>
+      <yloc>60</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Belum ada di ERP?</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Bangun inferred member</send_true_to>
+    <send_false_to>Sudah ada di ERP</send_false_to>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue>status_pemetaan</leftvalue>
+        <function>=</function>
+        <rightvalue/>
+        <value><name>constant</name><type>String</type><text>LATE ARRIVING</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>820</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Sudah ada di ERP</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>820</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Bangun inferred member</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+// Late arriving dimension: produk sah di katalog ECOM tetapi belum ada di ERP.
+// Dibuat baris dim_produk sementara (is_inferred=1, harga_pokok NULL) agar fakta tetap bisa dimuat;
+// saat ERP mengirim material resmi, baris ini di-update (SCD tipe 1) dan pemetaan diperbarui.
+var nama_produk_inf = nama_produk_sumber;
+var merk_inf = trimStr(brand);
+var kategori_inf = trimStr(kategori_ecom);
+var sub_kategori_inf = trimStr(sub_kategori_ecom);
+var status_produk_inf = 'INFERRED';
+var pemasok_key_inf = -1;
+var nama_pemasok_inf = 'Belum diketahui (menunggu ERP)';
+var versi_inf = 1;
+var berlaku_sejak_inf = str2date('1900-01-01', 'yyyy-MM-dd');
+var berlaku_sampai_inf = str2date('9999-12-31', 'yyyy-MM-dd');
+var is_current_inf = 1;
+var is_inferred_inf = 1;
+var sumber_data_inf = 'INFERRED dari S1 ECOM';
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>nama_produk_inf</name><rename>nama_produk_inf</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>merk_inf</name><rename>merk_inf</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kategori_inf</name><rename>kategori_inf</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>sub_kategori_inf</name><rename>sub_kategori_inf</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>status_produk_inf</name><rename>status_produk_inf</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>pemasok_key_inf</name><rename>pemasok_key_inf</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nama_pemasok_inf</name><rename>nama_pemasok_inf</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>versi_inf</name><rename>versi_inf</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>berlaku_sejak_inf</name><rename>berlaku_sejak_inf</rename><type>Date</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>berlaku_sampai_inf</name><rename>berlaku_sampai_inf</rename><type>Date</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>is_current_inf</name><rename>is_current_inf</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>is_inferred_inf</name><rename>is_inferred_inf</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>sumber_data_inf</name><rename>sumber_data_inf</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1010</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Tulis inferred ke dim_produk</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <schema/>
+    <table>dim_produk</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields><field><column_name>material_no</column_name><stream_name>material_no_map</stream_name></field><field><column_name>nama_produk</column_name><stream_name>nama_produk_inf</stream_name></field><field><column_name>merk</column_name><stream_name>merk_inf</stream_name></field><field><column_name>kategori</column_name><stream_name>kategori_inf</stream_name></field><field><column_name>sub_kategori</column_name><stream_name>sub_kategori_inf</stream_name></field><field><column_name>status_produk</column_name><stream_name>status_produk_inf</stream_name></field><field><column_name>pemasok_key</column_name><stream_name>pemasok_key_inf</stream_name></field><field><column_name>nama_pemasok</column_name><stream_name>nama_pemasok_inf</stream_name></field><field><column_name>versi</column_name><stream_name>versi_inf</stream_name></field><field><column_name>berlaku_sejak</column_name><stream_name>berlaku_sejak_inf</stream_name></field><field><column_name>berlaku_sampai</column_name><stream_name>berlaku_sampai_inf</stream_name></field><field><column_name>is_current</column_name><stream_name>is_current_inf</stream_name></field><field><column_name>is_inferred</column_name><stream_name>is_inferred_inf</stream_name></field><field><column_name>sumber_data</column_name><stream_name>sumber_data_inf</stream_name></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1200</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>S2 product_master_local.csv</name>
+    <type>TextFileInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <accept_filenames>N</accept_filenames>
+    <passing_through_fields>N</passing_through_fields>
+    <accept_field/>
+    <accept_stepname/>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar/>
+    <header>Y</header>
+    <nr_headerlines>1</nr_headerlines>
+    <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>mixed</format>
+    <encoding>UTF-8</encoding>
+    <length>Characters</length>
+    <add_to_result_filenames>N</add_to_result_filenames>
+    <file>
+      <name>${Internal.Entry.Current.Directory}/../Data_Sumber/S2_POS_TOKO/product_master_local.csv</name>
+      <filemask/>
+      <exclude_filemask/>
+      <file_required>Y</file_required>
+      <include_subfolders>N</include_subfolders>
+      <type>CSV</type>
+      <compression>None</compression>
+    </file>
+    <filters>
+    </filters>
+    <fields><field><name>item_code</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>barcode</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>product_name</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>category_local</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>unit_price_excl_ppn</name><type>Number</type><format>#.##</format><currency/><decimal>.</decimal><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field></fields>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <skip_bad_files>N</skip_bad_files>
+    <file_error_field/>
+    <file_error_message_field/>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>N</date_format_lenient>
+    <date_format_locale>en_US</date_format_locale>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>60</xloc>
+      <yloc>390</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>S2 kandidat material_no</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+// kode item POS sudah memakai format material ERP (P-nnnn)
+var sumber = 'S2';
+var kandidat_material = upperStr(item_code);
+var nama_produk_sumber = trimStr(product_name);
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>sumber</name><rename>sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kandidat_material</name><rename>kandidat_material</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nama_produk_sumber</name><rename>nama_produk_sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>250</xloc>
+      <yloc>390</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>S2 cek di master ERP</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_produk</table>
+      <orderby>versi</orderby>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key><name>kandidat_material</name><field>material_no</field><condition>=</condition><name2/></key>
+      <value><name>nama_produk</name><rename>nama_erp</rename><default/><type>String</type></value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>440</xloc>
+      <yloc>390</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>S2 status pemetaan</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+var kode_produk_sumber = upperStr(item_code);
+var material_no_map = null;
+var status_pemetaan = null;
+var metode_pemetaan = null;
+if (nama_erp != null) {
+  material_no_map = kandidat_material;
+  status_pemetaan = 'TERPETAKAN';
+  metode_pemetaan = 'item_code = material_no';
+} else {
+  material_no_map = 'INF-' + kode_produk_sumber;
+  status_pemetaan = 'LATE ARRIVING';
+  metode_pemetaan = 'Belum terdaftar di master ERP (S4): dibuat inferred member';
+}
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>kode_produk_sumber</name><rename>kode_produk_sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>material_no_map</name><rename>material_no_map</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>status_pemetaan</name><rename>status_pemetaan</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>metode_pemetaan</name><rename>metode_pemetaan</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>630</xloc>
+      <yloc>390</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>S2 tulis map_produk</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <schema/>
+    <table>map_produk</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields><field><column_name>sumber</column_name><stream_name>sumber</stream_name></field><field><column_name>kode_produk_sumber</column_name><stream_name>kode_produk_sumber</stream_name></field><field><column_name>nama_produk_sumber</column_name><stream_name>nama_produk_sumber</stream_name></field><field><column_name>material_no</column_name><stream_name>material_no_map</stream_name></field><field><column_name>status_pemetaan</column_name><stream_name>status_pemetaan</stream_name></field><field><column_name>metode_pemetaan</column_name><stream_name>metode_pemetaan</stream_name></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>820</xloc>
+      <yloc>390</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>S3 seller_sku unik (staging)</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <sql>SELECT DISTINCT seller_sku FROM stg_mpl_item ORDER BY seller_sku</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>60</xloc>
+      <yloc>500</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>S3 turunkan material_no dari seller_sku</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+// pola seller_sku marketplace: &lt;6 huruf prefiks merk/kategori&gt;&lt;4 digit nomor material&gt;  -&gt;  P-&lt;4 digit&gt;
+var sumber = 'S3';
+var m = String(upperStr(seller_sku)).match(/(\d{4})$/);
+var kandidat_material = m != null ? 'P-' + m[1] : null;
+var nama_produk_sumber = null;
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>sumber</name><rename>sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kandidat_material</name><rename>kandidat_material</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nama_produk_sumber</name><rename>nama_produk_sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>250</xloc>
+      <yloc>500</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>S3 cek di master ERP</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_produk</table>
+      <orderby>versi</orderby>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key><name>kandidat_material</name><field>material_no</field><condition>=</condition><name2/></key>
+      <value><name>nama_produk</name><rename>nama_erp</rename><default/><type>String</type></value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>440</xloc>
+      <yloc>500</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>S3 status pemetaan</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+var kode_produk_sumber = upperStr(seller_sku);
+var material_no_map = null;
+var status_pemetaan = null;
+var metode_pemetaan = null;
+if (nama_erp != null) {
+  material_no_map = kandidat_material;
+  status_pemetaan = 'TERPETAKAN';
+  metode_pemetaan = 'Pola XXXXXXnnnn -&gt; P-nnnn';
+} else {
+  material_no_map = 'INF-' + kode_produk_sumber;
+  status_pemetaan = 'LATE ARRIVING';
+  metode_pemetaan = 'Belum terdaftar di master ERP (S4): dibuat inferred member';
+}
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>kode_produk_sumber</name><rename>kode_produk_sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>material_no_map</name><rename>material_no_map</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>status_pemetaan</name><rename>status_pemetaan</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>metode_pemetaan</name><rename>metode_pemetaan</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>630</xloc>
+      <yloc>500</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>S3 tulis map_produk</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <schema/>
+    <table>map_produk</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields><field><column_name>sumber</column_name><stream_name>sumber</stream_name></field><field><column_name>kode_produk_sumber</column_name><stream_name>kode_produk_sumber</stream_name></field><field><column_name>nama_produk_sumber</column_name><stream_name>nama_produk_sumber</stream_name></field><field><column_name>material_no</column_name><stream_name>material_no_map</stream_name></field><field><column_name>status_pemetaan</column_name><stream_name>status_pemetaan</stream_name></field><field><column_name>metode_pemetaan</column_name><stream_name>metode_pemetaan</stream_name></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>820</xloc>
+      <yloc>500</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step_error_handling>
+  </step_error_handling>
+  <slave-step-copy-partition-distribution>
+  </slave-step-copy-partition-distribution>
+  <slave_transformation>N</slave_transformation>
+</transformation>

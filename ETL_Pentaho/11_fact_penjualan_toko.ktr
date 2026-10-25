@@ -1,0 +1,1054 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>11_fact_penjualan_toko</name>
+    <description>Muat fakta penjualan kanal toko fisik (S2 POS_TOKO, 42 toko): grain = trx line</description>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
+    <directory>/</directory>
+    <parameters>
+    </parameters>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <created_user>-</created_user>
+    <created_date>2026/10/25 12:00:00.000</created_date>
+    <modified_user>-</modified_user>
+    <modified_date>2026/10/25 12:00:00.000</modified_date>
+    <is_key_private>N</is_key_private>
+  </info>
+  <notepads>
+    <notepad>
+      <note>S2: 42 toko x (header, line, payment) dibaca dengan wildcard. Tanggal DD/MM/YYYY -&gt; Date.
+Status VOID dibuang. Pembayaran SPLIT diringkas per trx sebelum digabung (grain tetap trx line).
+Kampanye: baris berdiskon dicocokkan ke kampanye toko (Toko Fisik/Semua Kanal) yang aktif pada tanggal trx.</note>
+      <xloc>60</xloc>
+      <yloc>0</yloc>
+      <width>720</width>
+      <heigth>55</heigth>
+      <fontname>Segoe UI</fontname>
+      <fontsize>9</fontsize>
+      <fontbold>N</fontbold>
+      <fontitalic>N</fontitalic>
+      <fontcolorred>0</fontcolorred>
+      <fontcolorgreen>0</fontcolorgreen>
+      <fontcolorblue>0</fontcolorblue>
+      <backgroundcolorred>255</backgroundcolorred>
+      <backgroundcolorgreen>244</backgroundcolorgreen>
+      <backgroundcolorblue>204</backgroundcolorblue>
+      <bordercolorred>100</bordercolorred>
+      <bordercolorgreen>100</bordercolorgreen>
+      <bordercolorblue>100</bordercolorblue>
+      <drawshadow>N</drawshadow>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>conn_nrg_ecom</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>nrg_ecom</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes><attribute><code>EXTRA_OPTION_MYSQL.useSSL</code><attribute>false</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.allowPublicKeyRetrieval</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.characterEncoding</code><attribute>UTF-8</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute><attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute><attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute><attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute><attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute><attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>USE_POOLING</code><attribute>N</attribute></attribute></attributes>
+  </connection>
+  <connection>
+    <name>conn_nrg_dw</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>nrg_dw</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes><attribute><code>EXTRA_OPTION_MYSQL.useSSL</code><attribute>false</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.allowPublicKeyRetrieval</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.characterEncoding</code><attribute>UTF-8</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.createDatabaseIfNotExist</code><attribute>true</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute><attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute><attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute><attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute><attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute><attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>USE_POOLING</code><attribute>N</attribute></attribute></attributes>
+  </connection>
+  <order>
+    <hop>
+      <from>Baca trx_header_TSxx.csv (42 toko)</from>
+      <to>Konversi tanggal DD/MM/YYYY</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Baca trx_payment_TSxx.csv (42 toko)</from>
+      <to>Urutkan pembayaran per trx</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Urutkan pembayaran per trx</from>
+      <to>Ringkas pembayaran (SPLIT)</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Baca trx_line_TSxx.csv (42 toko)</from>
+      <to>Gabung header transaksi</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Gabung header transaksi</from>
+      <to>Transaksi VOID?</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Transaksi VOID?</from>
+      <to>Gabung ringkasan pembayaran</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Gabung ringkasan pembayaran</from>
+      <to>Hitung nilai &amp; atribut</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Konversi tanggal DD/MM/YYYY</from>
+      <to>Gabung header transaksi</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Ringkas pembayaran (SPLIT)</from>
+      <to>Gabung ringkasan pembayaran</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Transaksi VOID?</from>
+      <to>Buang transaksi VOID</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Hitung nilai &amp; atribut</from>
+      <to>Lookup material_no (map_produk)</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Lookup material_no (map_produk)</from>
+      <to>Lookup versi produk berlaku (SCD2)</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Lookup versi produk berlaku (SCD2)</from>
+      <to>Lookup kanal_key</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Lookup kanal_key</from>
+      <to>Lookup pelanggan_key</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Lookup pelanggan_key</from>
+      <to>Lookup kampanye_key</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Lookup kampanye_key</from>
+      <to>Kunci default, HPP &amp; margin kotor</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Kunci default, HPP &amp; margin kotor</from>
+      <to>Tulis fact_penjualan</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+  <step>
+    <name>Baca trx_line_TSxx.csv (42 toko)</name>
+    <type>TextFileInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <accept_filenames>N</accept_filenames>
+    <passing_through_fields>N</passing_through_fields>
+    <accept_field/>
+    <accept_stepname/>
+    <separator>;</separator>
+    <enclosure>"</enclosure>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar/>
+    <header>Y</header>
+    <nr_headerlines>1</nr_headerlines>
+    <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>mixed</format>
+    <encoding>UTF-8</encoding>
+    <length>Characters</length>
+    <add_to_result_filenames>N</add_to_result_filenames>
+    <file>
+      <name>${Internal.Entry.Current.Directory}/../Data_Sumber/S2_POS_TOKO</name>
+      <filemask>trx_line_TS[0-9]+\.csv</filemask>
+      <exclude_filemask/>
+      <file_required>Y</file_required>
+      <include_subfolders>N</include_subfolders>
+      <type>CSV</type>
+      <compression>None</compression>
+    </file>
+    <filters>
+    </filters>
+    <fields><field><name>trx_no</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>line_seq</name><type>Integer</type><format>#</format><currency/><decimal>.</decimal><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>item_code</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>qty</name><type>Integer</type><format>#</format><currency/><decimal>.</decimal><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>unit_price_excl</name><type>Number</type><format>#.##</format><currency/><decimal>.</decimal><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>disc_pct</name><type>Number</type><format>#.##</format><currency/><decimal>.</decimal><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field></fields>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <skip_bad_files>N</skip_bad_files>
+    <file_error_field/>
+    <file_error_message_field/>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>N</date_format_lenient>
+    <date_format_locale>en_US</date_format_locale>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>60</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Baca trx_header_TSxx.csv (42 toko)</name>
+    <type>TextFileInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <accept_filenames>N</accept_filenames>
+    <passing_through_fields>N</passing_through_fields>
+    <accept_field/>
+    <accept_stepname/>
+    <separator>;</separator>
+    <enclosure>"</enclosure>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar/>
+    <header>Y</header>
+    <nr_headerlines>1</nr_headerlines>
+    <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>mixed</format>
+    <encoding>UTF-8</encoding>
+    <length>Characters</length>
+    <add_to_result_filenames>N</add_to_result_filenames>
+    <file>
+      <name>${Internal.Entry.Current.Directory}/../Data_Sumber/S2_POS_TOKO</name>
+      <filemask>trx_header_TS[0-9]+\.csv</filemask>
+      <exclude_filemask/>
+      <file_required>Y</file_required>
+      <include_subfolders>N</include_subfolders>
+      <type>CSV</type>
+      <compression>None</compression>
+    </file>
+    <filters>
+    </filters>
+    <fields><field><name>trx_no</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>store_code</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>cashier_id</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>member_no</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>trx_date</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>payment_type</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>status</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field></fields>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <skip_bad_files>N</skip_bad_files>
+    <file_error_field/>
+    <file_error_message_field/>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>N</date_format_lenient>
+    <date_format_locale>en_US</date_format_locale>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>60</xloc>
+      <yloc>60</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Konversi tanggal DD/MM/YYYY</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields><select_unspecified>N</select_unspecified><meta><name>trx_date</name><rename>tanggal</rename><type>Date</type><length>-2</length><precision>-2</precision><storage_type/><conversion_mask>dd/MM/yyyy</conversion_mask><date_format_lenient>false</date_format_lenient><date_format_locale>en_US</date_format_locale><date_format_timezone/><lenient_string_to_number>false</lenient_string_to_number><encoding/><decimal_symbol/><grouping_symbol/><currency_symbol/></meta></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>250</xloc>
+      <yloc>60</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Baca trx_payment_TSxx.csv (42 toko)</name>
+    <type>TextFileInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <accept_filenames>N</accept_filenames>
+    <passing_through_fields>N</passing_through_fields>
+    <accept_field/>
+    <accept_stepname/>
+    <separator>;</separator>
+    <enclosure>"</enclosure>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar/>
+    <header>Y</header>
+    <nr_headerlines>1</nr_headerlines>
+    <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>mixed</format>
+    <encoding>UTF-8</encoding>
+    <length>Characters</length>
+    <add_to_result_filenames>N</add_to_result_filenames>
+    <file>
+      <name>${Internal.Entry.Current.Directory}/../Data_Sumber/S2_POS_TOKO</name>
+      <filemask>trx_payment_TS[0-9]+\.csv</filemask>
+      <exclude_filemask/>
+      <file_required>Y</file_required>
+      <include_subfolders>N</include_subfolders>
+      <type>CSV</type>
+      <compression>None</compression>
+    </file>
+    <filters>
+    </filters>
+    <fields><field><name>trx_no</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>method</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>amount</name><type>Number</type><format>#.##</format><currency/><decimal>.</decimal><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field></fields>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <skip_bad_files>N</skip_bad_files>
+    <file_error_field/>
+    <file_error_message_field/>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>N</date_format_lenient>
+    <date_format_locale>en_US</date_format_locale>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>60</xloc>
+      <yloc>500</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Urutkan pembayaran per trx</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields><field><name>trx_no</name><ascending>Y</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field><field><name>method</name><ascending>Y</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>250</xloc>
+      <yloc>500</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Ringkas pembayaran (SPLIT)</name>
+    <type>GroupBy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <all_rows>N</all_rows>
+    <ignore_aggregate>N</ignore_aggregate>
+    <field_ignore/>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>grp</prefix>
+    <add_linenr>N</add_linenr>
+    <linenr_fieldname/>
+    <give_back_row>N</give_back_row>
+    <group><field><name>trx_no</name></field></group>
+    <fields><field><aggregate>jumlah_baris_bayar</aggregate><subject>method</subject><type>COUNT_ALL</type><valuefield/></field><field><aggregate>total_bayar</aggregate><subject>amount</subject><type>SUM</type><valuefield/></field><field><aggregate>daftar_metode</aggregate><subject>method</subject><type>CONCAT_STRING</type><valuefield>+</valuefield></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>440</xloc>
+      <yloc>500</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Gabung header transaksi</name>
+    <type>StreamLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <from>Konversi tanggal DD/MM/YYYY</from>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>Y</preserve_memory>
+    <sorted_list>N</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup><key><name>trx_no</name><field>trx_no</field></key><value><name>store_code</name><rename>store_code</rename><default/><type>String</type></value><value><name>cashier_id</name><rename>cashier_id</rename><default/><type>String</type></value><value><name>member_no</name><rename>member_no</rename><default/><type>String</type></value><value><name>tanggal</name><rename>tanggal</rename><default/><type>Date</type></value><value><name>payment_type</name><rename>payment_type</rename><default/><type>String</type></value><value><name>status</name><rename>status</rename><default/><type>String</type></value></lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>250</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Transaksi VOID?</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Buang transaksi VOID</send_true_to>
+    <send_false_to>Gabung ringkasan pembayaran</send_false_to>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue>status</leftvalue>
+        <function>=</function>
+        <rightvalue/>
+        <value><name>constant</name><type>String</type><text>VOID</text><length>-1</length><precision>-1</precision><isnull>N</isnull><mask/></value>
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>440</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Buang transaksi VOID</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>440</xloc>
+      <yloc>390</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Gabung ringkasan pembayaran</name>
+    <type>StreamLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <from>Ringkas pembayaran (SPLIT)</from>
+    <input_sorted>N</input_sorted>
+    <preserve_memory>Y</preserve_memory>
+    <sorted_list>N</sorted_list>
+    <integer_pair>N</integer_pair>
+    <lookup><key><name>trx_no</name><field>trx_no</field></key><value><name>jumlah_baris_bayar</name><rename>jumlah_baris_bayar</rename><default/><type>Integer</type></value><value><name>total_bayar</name><rename>total_bayar</rename><default/><type>Number</type></value><value><name>daftar_metode</name><rename>daftar_metode</rename><default/><type>String</type></value></lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>630</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Hitung nilai &amp; atribut</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+// harga S2 sudah tanpa PPN; diskon dinyatakan dalam persen -&gt; dikonversi ke rupiah
+var harga_satuan_excl_ppn = r2(num(unit_price_excl));
+var penjualan_bruto = r2(num(qty) * harga_satuan_excl_ppn);
+var diskon_rp = r2(penjualan_bruto * (disc_pct == null ? 0 : num(disc_pct)) / 100);
+var penjualan_netto = r2(penjualan_bruto - diskon_rp);
+var fee_komisi = 0;
+var fee_layanan = 0;
+var qty_retur = 0;
+var nilai_retur = 0;
+var waktu_transaksi_wib = tanggal;
+var tanggal_key = dateKey(tanggal);
+// SPLIT: &gt;1 baris trx_payment untuk 1 transaksi -&gt; diringkas, tidak menggandakan baris item
+var metode_pembayaran = (jumlah_baris_bayar != null &amp;&amp; jumlah_baris_bayar &gt; 1) ? 'SPLIT (' + daftar_metode + ')'
+                       : (daftar_metode != null ? daftar_metode : upperStr(payment_type));
+var sumber_sistem = 'S2';
+var map_sumber = 'S2';
+var kanal_kode = upperStr(store_code);
+var nomor_transaksi = trimStr(trx_no);
+var line_id = '' + line_seq;
+var kode_produk_sumber = upperStr(item_code);
+var no_member = upperStr(member_no);
+var konstanta_1 = 1;
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>harga_satuan_excl_ppn</name><rename>harga_satuan_excl_ppn</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>penjualan_bruto</name><rename>penjualan_bruto</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>diskon_rp</name><rename>diskon_rp</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>penjualan_netto</name><rename>penjualan_netto</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>fee_komisi</name><rename>fee_komisi</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>fee_layanan</name><rename>fee_layanan</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>qty_retur</name><rename>qty_retur</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nilai_retur</name><rename>nilai_retur</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>waktu_transaksi_wib</name><rename>waktu_transaksi_wib</rename><type>Date</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>tanggal_key</name><rename>tanggal_key</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>metode_pembayaran</name><rename>metode_pembayaran</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>sumber_sistem</name><rename>sumber_sistem</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>map_sumber</name><rename>map_sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kanal_kode</name><rename>kanal_kode</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nomor_transaksi</name><rename>nomor_transaksi</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>line_id</name><rename>line_id</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kode_produk_sumber</name><rename>kode_produk_sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>no_member</name><rename>no_member</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>konstanta_1</name><rename>konstanta_1</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>820</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Lookup material_no (map_produk)</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>map_produk</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key><name>map_sumber</name><field>sumber</field><condition>=</condition><name2/></key><key><name>kode_produk_sumber</name><field>kode_produk_sumber</field><condition>=</condition><name2/></key>
+      <value><name>material_no</name><rename>material_no</rename><default>N/A</default><type>String</type></value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1010</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Lookup versi produk berlaku (SCD2)</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_produk</table>
+      <orderby>berlaku_sejak DESC</orderby>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key><name>material_no</name><field>material_no</field><condition>=</condition><name2/></key><key><name>tanggal</name><field>berlaku_sejak</field><condition>&lt;=</condition><name2/></key><key><name>tanggal</name><field>berlaku_sampai</field><condition>&gt;=</condition><name2/></key>
+      <value><name>produk_key</name><rename>produk_key</rename><default>-1</default><type>Integer</type></value><value><name>harga_pokok</name><rename>harga_pokok</rename><default/><type>Number</type></value><value><name>pemasok_key</name><rename>pemasok_key</rename><default>-1</default><type>Integer</type></value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1200</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Lookup kanal_key</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_kanal</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key><name>kanal_kode</name><field>kanal_kode</field><condition>=</condition><name2/></key>
+      <value><name>kanal_key</name><rename>kanal_key</rename><default>-1</default><type>Integer</type></value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1390</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Lookup pelanggan_key</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_pelanggan</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key><name>no_member</name><field>no_member_toko</field><condition>=</condition><name2/></key>
+      <value><name>pelanggan_key</name><rename>pelanggan_key</rename><default>-1</default><type>Integer</type></value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1580</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Lookup kampanye_key</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_kampanye</table>
+      <orderby>tanggal_mulai DESC</orderby>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key><name>konstanta_1</name><field>berlaku_toko</field><condition>=</condition><name2/></key><key><name>tanggal</name><field>tanggal_mulai</field><condition>&lt;=</condition><name2/></key><key><name>tanggal</name><field>tanggal_selesai</field><condition>&gt;=</condition><name2/></key>
+      <value><name>kampanye_key</name><rename>kampanye_key</rename><default>-1</default><type>Integer</type></value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1770</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Kunci default, HPP &amp; margin kotor</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+// transaksi tanpa member -&gt; 'Non-Member Toko'
+if (no_member == null) pelanggan_key = -2;
+// baris tanpa diskon -&gt; 'Tanpa Kampanye'; diskon di luar periode kampanye toko -&gt; -1
+if (diskon_rp == 0) kampanye_key = -2;
+
+// HPP dari versi harga pokok yang berlaku pada tanggal transaksi (NULL bila produk inferred)
+var hpp_satuan = harga_pokok == null ? null : r2(num(harga_pokok));
+var hpp = hpp_satuan == null ? null : r2(num(qty) * hpp_satuan);
+var margin_kotor = hpp == null ? null : r2(penjualan_netto - hpp - fee_komisi - fee_layanan);
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>pelanggan_key</name><rename>pelanggan_key</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>Y</replace></field><field><name>kampanye_key</name><rename>kampanye_key</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>Y</replace></field><field><name>hpp_satuan</name><rename>hpp_satuan</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>hpp</name><rename>hpp</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>margin_kotor</name><rename>margin_kotor</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1960</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Tulis fact_penjualan</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <schema/>
+    <table>fact_penjualan</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields><field><column_name>tanggal_key</column_name><stream_name>tanggal_key</stream_name></field><field><column_name>produk_key</column_name><stream_name>produk_key</stream_name></field><field><column_name>pemasok_key</column_name><stream_name>pemasok_key</stream_name></field><field><column_name>kanal_key</column_name><stream_name>kanal_key</stream_name></field><field><column_name>pelanggan_key</column_name><stream_name>pelanggan_key</stream_name></field><field><column_name>kampanye_key</column_name><stream_name>kampanye_key</stream_name></field><field><column_name>sumber_sistem</column_name><stream_name>sumber_sistem</stream_name></field><field><column_name>nomor_transaksi</column_name><stream_name>nomor_transaksi</stream_name></field><field><column_name>line_id</column_name><stream_name>line_id</stream_name></field><field><column_name>kode_produk_sumber</column_name><stream_name>kode_produk_sumber</stream_name></field><field><column_name>waktu_transaksi_wib</column_name><stream_name>waktu_transaksi_wib</stream_name></field><field><column_name>metode_pembayaran</column_name><stream_name>metode_pembayaran</stream_name></field><field><column_name>qty</column_name><stream_name>qty</stream_name></field><field><column_name>harga_satuan_excl_ppn</column_name><stream_name>harga_satuan_excl_ppn</stream_name></field><field><column_name>penjualan_bruto</column_name><stream_name>penjualan_bruto</stream_name></field><field><column_name>diskon_rp</column_name><stream_name>diskon_rp</stream_name></field><field><column_name>penjualan_netto</column_name><stream_name>penjualan_netto</stream_name></field><field><column_name>hpp_satuan</column_name><stream_name>hpp_satuan</stream_name></field><field><column_name>hpp</column_name><stream_name>hpp</stream_name></field><field><column_name>fee_komisi</column_name><stream_name>fee_komisi</stream_name></field><field><column_name>fee_layanan</column_name><stream_name>fee_layanan</stream_name></field><field><column_name>margin_kotor</column_name><stream_name>margin_kotor</stream_name></field><field><column_name>qty_retur</column_name><stream_name>qty_retur</stream_name></field><field><column_name>nilai_retur</column_name><stream_name>nilai_retur</stream_name></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>2150</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step_error_handling>
+  </step_error_handling>
+  <slave-step-copy-partition-distribution>
+  </slave-step-copy-partition-distribution>
+  <slave_transformation>N</slave_transformation>
+</transformation>

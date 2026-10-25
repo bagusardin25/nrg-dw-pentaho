@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>08_dim_kampanye</name>
+    <description>Dimensi kampanye dari S5 (sengaja kotor): baris kosong, kode tak konsisten, duplikat, nilai teks</description>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
+    <directory>/</directory>
+    <parameters>
+    </parameters>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <created_user>-</created_user>
+    <created_date>2026/10/25 12:00:00.000</created_date>
+    <modified_user>-</modified_user>
+    <modified_date>2026/10/25 12:00:00.000</modified_date>
+    <is_key_private>N</is_key_private>
+  </info>
+  <notepads>
+    <notepad>
+      <note>S5 MKT_SHEET: 1) TRIM + UPPER kode promo (&quot;newyear10 &quot; -&gt; NEWYEAR10)  2) buang baris kosong
+3) buang duplikat persis  4) konversi angka/tanggal; baris gagal (mis. target_diskon_persen = &quot;sepuluh&quot;)
+    TIDAK dipaksa/dibuang diam-diam, melainkan dialihkan lewat error handling ke tabel err_kampanye.</note>
+      <xloc>60</xloc>
+      <yloc>0</yloc>
+      <width>700</width>
+      <heigth>55</heigth>
+      <fontname>Segoe UI</fontname>
+      <fontsize>9</fontsize>
+      <fontbold>N</fontbold>
+      <fontitalic>N</fontitalic>
+      <fontcolorred>0</fontcolorred>
+      <fontcolorgreen>0</fontcolorgreen>
+      <fontcolorblue>0</fontcolorblue>
+      <backgroundcolorred>255</backgroundcolorred>
+      <backgroundcolorgreen>244</backgroundcolorgreen>
+      <backgroundcolorblue>204</backgroundcolorblue>
+      <bordercolorred>100</bordercolorred>
+      <bordercolorgreen>100</bordercolorgreen>
+      <bordercolorblue>100</bordercolorblue>
+      <drawshadow>N</drawshadow>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>conn_nrg_ecom</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>nrg_ecom</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes><attribute><code>EXTRA_OPTION_MYSQL.useSSL</code><attribute>false</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.allowPublicKeyRetrieval</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.characterEncoding</code><attribute>UTF-8</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute><attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute><attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute><attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute><attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute><attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>USE_POOLING</code><attribute>N</attribute></attribute></attributes>
+  </connection>
+  <connection>
+    <name>conn_nrg_dw</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>nrg_dw</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes><attribute><code>EXTRA_OPTION_MYSQL.useSSL</code><attribute>false</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.allowPublicKeyRetrieval</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.characterEncoding</code><attribute>UTF-8</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.createDatabaseIfNotExist</code><attribute>true</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute><attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute><attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute><attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute><attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute><attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>USE_POOLING</code><attribute>N</attribute></attribute></attributes>
+  </connection>
+  <order>
+    <hop>
+      <from>Baca kampanye_marketing.csv (S5)</from>
+      <to>Bersihkan teks (TRIM, UPPER kode)</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Bersihkan teks (TRIM, UPPER kode)</from>
+      <to>Baris kosong?</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Baris kosong?</from>
+      <to>Urutkan semua kolom</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Urutkan semua kolom</from>
+      <to>Buang duplikat persis</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Buang duplikat persis</from>
+      <to>Validasi &amp; konversi tipe</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Validasi &amp; konversi tipe</from>
+      <to>Turunkan atribut kampanye</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Turunkan atribut kampanye</from>
+      <to>Tulis dim_kampanye</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Baris kosong?</from>
+      <to>Buang baris kosong</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Validasi &amp; konversi tipe</from>
+      <to>Tulis err_kampanye</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+  <step>
+    <name>Baca kampanye_marketing.csv (S5)</name>
+    <type>TextFileInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <accept_filenames>N</accept_filenames>
+    <passing_through_fields>N</passing_through_fields>
+    <accept_field/>
+    <accept_stepname/>
+    <separator>,</separator>
+    <enclosure>"</enclosure>
+    <enclosure_breaks>N</enclosure_breaks>
+    <escapechar/>
+    <header>Y</header>
+    <nr_headerlines>1</nr_headerlines>
+    <footer>N</footer>
+    <nr_footerlines>1</nr_footerlines>
+    <line_wrapped>N</line_wrapped>
+    <nr_wraps>1</nr_wraps>
+    <layout_paged>N</layout_paged>
+    <nr_lines_per_page>80</nr_lines_per_page>
+    <nr_lines_doc_header>0</nr_lines_doc_header>
+    <noempty>Y</noempty>
+    <include>N</include>
+    <include_field/>
+    <rownum>N</rownum>
+    <rownumByFile>N</rownumByFile>
+    <rownum_field/>
+    <format>mixed</format>
+    <encoding>UTF-8</encoding>
+    <length>Characters</length>
+    <add_to_result_filenames>N</add_to_result_filenames>
+    <file>
+      <name>${Internal.Entry.Current.Directory}/../Data_Sumber/S5_MKT_SHEET/kampanye_marketing.csv</name>
+      <filemask/>
+      <exclude_filemask/>
+      <file_required>Y</file_required>
+      <include_subfolders>N</include_subfolders>
+      <type>CSV</type>
+      <compression>None</compression>
+    </file>
+    <filters>
+    </filters>
+    <fields><field><name>kode_promo</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>nama_kampanye</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>jenis_promo</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>kanal</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>tgl_mulai</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>tgl_selesai</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>target_diskon_persen</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field><field><name>pic</name><type>String</type><format/><currency/><decimal/><group/><nullif/><ifnull/><position>-1</position><length>-1</length><precision>-1</precision><trim_type>none</trim_type><repeat>N</repeat></field></fields>
+    <limit>0</limit>
+    <error_ignored>N</error_ignored>
+    <skip_bad_files>N</skip_bad_files>
+    <file_error_field/>
+    <file_error_message_field/>
+    <error_line_skipped>N</error_line_skipped>
+    <error_count_field/>
+    <error_fields_field/>
+    <error_text_field/>
+    <bad_line_files_destination_directory/>
+    <bad_line_files_extension>warning</bad_line_files_extension>
+    <error_line_files_destination_directory/>
+    <error_line_files_extension>error</error_line_files_extension>
+    <line_number_files_destination_directory/>
+    <line_number_files_extension>line</line_number_files_extension>
+    <date_format_lenient>N</date_format_lenient>
+    <date_format_locale>en_US</date_format_locale>
+    <shortFileFieldName/>
+    <pathFieldName/>
+    <hiddenFieldName/>
+    <lastModificationTimeFieldName/>
+    <uriNameFieldName/>
+    <rootUriNameFieldName/>
+    <extensionFieldName/>
+    <sizeFieldName/>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>60</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Bersihkan teks (TRIM, UPPER kode)</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+kode_promo = upperStr(kode_promo);
+nama_kampanye = trimStr(nama_kampanye);
+jenis_promo = trimStr(jenis_promo);
+kanal = trimStr(kanal);
+tgl_mulai = trimStr(tgl_mulai);
+tgl_selesai = trimStr(tgl_selesai);
+target_diskon_persen = trimStr(target_diskon_persen);
+pic = trimStr(pic);
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>kode_promo</name><rename>kode_promo</rename><type>String</type><length>-1</length><precision>-1</precision><replace>Y</replace></field><field><name>nama_kampanye</name><rename>nama_kampanye</rename><type>String</type><length>-1</length><precision>-1</precision><replace>Y</replace></field><field><name>jenis_promo</name><rename>jenis_promo</rename><type>String</type><length>-1</length><precision>-1</precision><replace>Y</replace></field><field><name>kanal</name><rename>kanal</rename><type>String</type><length>-1</length><precision>-1</precision><replace>Y</replace></field><field><name>tgl_mulai</name><rename>tgl_mulai</rename><type>String</type><length>-1</length><precision>-1</precision><replace>Y</replace></field><field><name>tgl_selesai</name><rename>tgl_selesai</rename><type>String</type><length>-1</length><precision>-1</precision><replace>Y</replace></field><field><name>target_diskon_persen</name><rename>target_diskon_persen</rename><type>String</type><length>-1</length><precision>-1</precision><replace>Y</replace></field><field><name>pic</name><rename>pic</rename><type>String</type><length>-1</length><precision>-1</precision><replace>Y</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>250</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Baris kosong?</name>
+    <type>FilterRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <send_true_to>Buang baris kosong</send_true_to>
+    <send_false_to>Urutkan semua kolom</send_false_to>
+    <compare>
+      <condition>
+        <negated>N</negated>
+        <leftvalue>kode_promo</leftvalue>
+        <function>IS NULL</function>
+        <rightvalue/>
+        
+      </condition>
+    </compare>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>440</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Buang baris kosong</name>
+    <type>Dummy</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>440</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Urutkan semua kolom</name>
+    <type>SortRows</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>out</prefix>
+    <sort_size>1000000</sort_size>
+    <free_memory/>
+    <compress>N</compress>
+    <compress_variable/>
+    <unique_rows>N</unique_rows>
+    <fields><field><name>kode_promo</name><ascending>Y</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field><field><name>nama_kampanye</name><ascending>Y</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field><field><name>jenis_promo</name><ascending>Y</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field><field><name>kanal</name><ascending>Y</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field><field><name>tgl_mulai</name><ascending>Y</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field><field><name>tgl_selesai</name><ascending>Y</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field><field><name>target_diskon_persen</name><ascending>Y</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field><field><name>pic</name><ascending>Y</ascending><case_sensitive>Y</case_sensitive><collator_enabled>N</collator_enabled><collator_strength>0</collator_strength><presorted>N</presorted></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>630</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Buang duplikat persis</name>
+    <type>Unique</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <count_rows>N</count_rows>
+    <count_field/>
+    <reject_duplicate_row>N</reject_duplicate_row>
+    <error_description/>
+    <fields><field><name>kode_promo</name><case_insensitive>N</case_insensitive></field><field><name>nama_kampanye</name><case_insensitive>N</case_insensitive></field><field><name>jenis_promo</name><case_insensitive>N</case_insensitive></field><field><name>kanal</name><case_insensitive>N</case_insensitive></field><field><name>tgl_mulai</name><case_insensitive>N</case_insensitive></field><field><name>tgl_selesai</name><case_insensitive>N</case_insensitive></field><field><name>target_diskon_persen</name><case_insensitive>N</case_insensitive></field><field><name>pic</name><case_insensitive>N</case_insensitive></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>820</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Validasi &amp; konversi tipe</name>
+    <type>SelectValues</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields><select_unspecified>N</select_unspecified><meta><name>target_diskon_persen</name><rename>target_diskon_persen</rename><type>Number</type><length>-2</length><precision>-2</precision><storage_type/><conversion_mask>#.##</conversion_mask><date_format_lenient>false</date_format_lenient><date_format_locale>en_US</date_format_locale><date_format_timezone/><lenient_string_to_number>false</lenient_string_to_number><encoding/><decimal_symbol>.</decimal_symbol><grouping_symbol/><currency_symbol/></meta><meta><name>tgl_mulai</name><rename>tgl_mulai</rename><type>Date</type><length>-2</length><precision>-2</precision><storage_type/><conversion_mask>dd-MM-yyyy</conversion_mask><date_format_lenient>false</date_format_lenient><date_format_locale>en_US</date_format_locale><date_format_timezone/><lenient_string_to_number>false</lenient_string_to_number><encoding/><decimal_symbol/><grouping_symbol/><currency_symbol/></meta><meta><name>tgl_selesai</name><rename>tgl_selesai</rename><type>Date</type><length>-2</length><precision>-2</precision><storage_type/><conversion_mask>dd-MM-yyyy</conversion_mask><date_format_lenient>false</date_format_lenient><date_format_locale>en_US</date_format_locale><date_format_timezone/><lenient_string_to_number>false</lenient_string_to_number><encoding/><decimal_symbol/><grouping_symbol/><currency_symbol/></meta></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1010</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Tulis err_kampanye</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <schema/>
+    <table>err_kampanye</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields><field><column_name>kode_promo</column_name><stream_name>kode_promo</stream_name></field><field><column_name>nama_kampanye</column_name><stream_name>nama_kampanye</stream_name></field><field><column_name>jenis_promo</column_name><stream_name>jenis_promo</stream_name></field><field><column_name>kanal</column_name><stream_name>kanal</stream_name></field><field><column_name>tgl_mulai</column_name><stream_name>tgl_mulai</stream_name></field><field><column_name>tgl_selesai</column_name><stream_name>tgl_selesai</stream_name></field><field><column_name>target_diskon_persen</column_name><stream_name>target_diskon_persen</stream_name></field><field><column_name>pic</column_name><stream_name>pic</stream_name></field><field><column_name>jumlah_error</column_name><stream_name>jumlah_error</stream_name></field><field><column_name>deskripsi_error</column_name><stream_name>deskripsi_error</stream_name></field><field><column_name>kolom_error</column_name><stream_name>kolom_error</stream_name></field><field><column_name>kode_error</column_name><stream_name>kode_error</stream_name></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1010</xloc>
+      <yloc>280</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Turunkan atribut kampanye</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+var berlaku_web = (kanal == 'Semua Kanal' || kanal == 'Situs Web') ? 1 : 0;
+var berlaku_toko = (kanal == 'Semua Kanal' || kanal == 'Toko Fisik') ? 1 : 0;
+var berlaku_marketplace = (kanal == 'Semua Kanal' || kanal == 'Marketplace') ? 1 : 0;
+var durasi_hari = Math.round((tgl_selesai.getTime() - tgl_mulai.getTime()) / 86400000) + 1;
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>berlaku_web</name><rename>berlaku_web</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>berlaku_toko</name><rename>berlaku_toko</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>berlaku_marketplace</name><rename>berlaku_marketplace</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>durasi_hari</name><rename>durasi_hari</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1200</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Tulis dim_kampanye</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <schema/>
+    <table>dim_kampanye</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields><field><column_name>kode_promo</column_name><stream_name>kode_promo</stream_name></field><field><column_name>nama_kampanye</column_name><stream_name>nama_kampanye</stream_name></field><field><column_name>jenis_promo</column_name><stream_name>jenis_promo</stream_name></field><field><column_name>kanal_kampanye</column_name><stream_name>kanal</stream_name></field><field><column_name>berlaku_web</column_name><stream_name>berlaku_web</stream_name></field><field><column_name>berlaku_toko</column_name><stream_name>berlaku_toko</stream_name></field><field><column_name>berlaku_marketplace</column_name><stream_name>berlaku_marketplace</stream_name></field><field><column_name>tanggal_mulai</column_name><stream_name>tgl_mulai</stream_name></field><field><column_name>tanggal_selesai</column_name><stream_name>tgl_selesai</stream_name></field><field><column_name>durasi_hari</column_name><stream_name>durasi_hari</stream_name></field><field><column_name>target_diskon_persen</column_name><stream_name>target_diskon_persen</stream_name></field><field><column_name>pic</column_name><stream_name>pic</stream_name></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1390</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step_error_handling>
+    <error>
+      <source_step>Validasi &amp; konversi tipe</source_step>
+      <target_step>Tulis err_kampanye</target_step>
+      <is_enabled>Y</is_enabled>
+      <nr_valuename>jumlah_error</nr_valuename>
+      <descriptions_valuename>deskripsi_error</descriptions_valuename>
+      <fields_valuename>kolom_error</fields_valuename>
+      <codes_valuename>kode_error</codes_valuename>
+      <max_errors/>
+      <max_pct_errors/>
+      <min_pct_rows/>
+    </error>
+  </step_error_handling>
+  <slave-step-copy-partition-distribution>
+  </slave-step-copy-partition-distribution>
+  <slave_transformation>N</slave_transformation>
+</transformation>

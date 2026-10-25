@@ -1,0 +1,9 @@
+# Arsip pengumpulan LMS (dibuat ulang dari isi repo, tidak perlu di-commit)
+NRG_DW_Tugas1_Kelompok7.zip
+
+# File sementara Microsoft Office (muncul saat .docx sedang dibuka)
+~$*
+
+# Cache Python (dari Data_Sumber/load_all.py)
+__pycache__/
+*.pyc

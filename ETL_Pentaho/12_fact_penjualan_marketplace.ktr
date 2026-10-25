@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>12_fact_penjualan_marketplace</name>
+    <description>Muat fakta penjualan kanal marketplace (S3 staging): grain = invoice item</description>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
+    <directory>/</directory>
+    <parameters>
+    </parameters>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <created_user>-</created_user>
+    <created_date>2026/10/25 12:00:00.000</created_date>
+    <modified_user>-</modified_user>
+    <modified_date>2026/10/25 12:00:00.000</modified_date>
+    <is_key_private>N</is_key_private>
+  </info>
+  <notepads>
+    <notepad>
+      <note>S3: margin kotor = penjualan netto - HPP - fee komisi - fee layanan (fee hanya kanal marketplace).</note>
+      <xloc>60</xloc>
+      <yloc>0</yloc>
+      <width>620</width>
+      <heigth>30</heigth>
+      <fontname>Segoe UI</fontname>
+      <fontsize>9</fontsize>
+      <fontbold>N</fontbold>
+      <fontitalic>N</fontitalic>
+      <fontcolorred>0</fontcolorred>
+      <fontcolorgreen>0</fontcolorgreen>
+      <fontcolorblue>0</fontcolorblue>
+      <backgroundcolorred>255</backgroundcolorred>
+      <backgroundcolorgreen>244</backgroundcolorgreen>
+      <backgroundcolorblue>204</backgroundcolorblue>
+      <bordercolorred>100</bordercolorred>
+      <bordercolorgreen>100</bordercolorgreen>
+      <bordercolorblue>100</bordercolorblue>
+      <drawshadow>N</drawshadow>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>conn_nrg_ecom</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>nrg_ecom</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes><attribute><code>EXTRA_OPTION_MYSQL.useSSL</code><attribute>false</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.allowPublicKeyRetrieval</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.characterEncoding</code><attribute>UTF-8</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute><attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute><attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute><attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute><attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute><attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>USE_POOLING</code><attribute>N</attribute></attribute></attributes>
+  </connection>
+  <connection>
+    <name>conn_nrg_dw</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>nrg_dw</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes><attribute><code>EXTRA_OPTION_MYSQL.useSSL</code><attribute>false</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.allowPublicKeyRetrieval</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.characterEncoding</code><attribute>UTF-8</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.createDatabaseIfNotExist</code><attribute>true</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute><attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute><attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute><attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute><attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute><attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>USE_POOLING</code><attribute>N</attribute></attribute></attributes>
+  </connection>
+  <order>
+    <hop>
+      <from>S3 item invoice (staging)</from>
+      <to>Hitung nilai tanpa PPN</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Hitung nilai tanpa PPN</from>
+      <to>Lookup material_no (map_produk)</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Lookup material_no (map_produk)</from>
+      <to>Lookup versi produk berlaku (SCD2)</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Lookup versi produk berlaku (SCD2)</from>
+      <to>Lookup kanal_key</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Lookup kanal_key</from>
+      <to>Lookup pelanggan_key</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Lookup pelanggan_key</from>
+      <to>Lookup kampanye_key</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Lookup kampanye_key</from>
+      <to>Kunci default, HPP &amp; margin kotor</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Kunci default, HPP &amp; margin kotor</from>
+      <to>Tulis fact_penjualan</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+  <step>
+    <name>S3 item invoice (staging)</name>
+    <type>TableInput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <sql>SELECT invoice, seller_sku, channel, buyer_hash, waktu_wib, qty,
+       price_incl_ppn, voucher_incl_ppn, fee_commission_alok, fee_service_alok
+FROM stg_mpl_item
+ORDER BY invoice, seller_sku</sql>
+    <limit>0</limit>
+    <lookup/>
+    <execute_each_row>N</execute_each_row>
+    <variables_active>N</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>60</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Hitung nilai tanpa PPN</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+// price &amp; voucher S3 sudah termasuk PPN 11% -&gt; dibagi 1,11
+var harga_satuan_excl_ppn = r2(num(price_incl_ppn) / PPN);
+var penjualan_bruto = r2(num(qty) * harga_satuan_excl_ppn);
+var diskon_rp = r2(num(voucher_incl_ppn) / PPN);
+var penjualan_netto = r2(penjualan_bruto - diskon_rp);
+// fee commission &amp; service sudah dialokasikan per item di 05_stg_mpl
+var fee_komisi = r2(num(fee_commission_alok));
+var fee_layanan = r2(num(fee_service_alok));
+var qty_retur = 0;
+var nilai_retur = 0;
+var waktu_transaksi_wib = waktu_wib;
+var tanggal = truncDate(waktu_wib);
+var tanggal_key = dateKey(tanggal);
+var metode_pembayaran = 'MARKETPLACE';
+var sumber_sistem = 'S3';
+var map_sumber = 'S3';
+var kanal_kode = trimStr(channel);
+var nomor_transaksi = invoice;
+var line_id = seller_sku;
+var kode_produk_sumber = seller_sku;
+var konstanta_1 = 1;
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>harga_satuan_excl_ppn</name><rename>harga_satuan_excl_ppn</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>penjualan_bruto</name><rename>penjualan_bruto</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>diskon_rp</name><rename>diskon_rp</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>penjualan_netto</name><rename>penjualan_netto</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>fee_komisi</name><rename>fee_komisi</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>fee_layanan</name><rename>fee_layanan</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>qty_retur</name><rename>qty_retur</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nilai_retur</name><rename>nilai_retur</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>waktu_transaksi_wib</name><rename>waktu_transaksi_wib</rename><type>Date</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>tanggal</name><rename>tanggal</rename><type>Date</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>tanggal_key</name><rename>tanggal_key</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>metode_pembayaran</name><rename>metode_pembayaran</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>sumber_sistem</name><rename>sumber_sistem</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>map_sumber</name><rename>map_sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kanal_kode</name><rename>kanal_kode</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nomor_transaksi</name><rename>nomor_transaksi</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>line_id</name><rename>line_id</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kode_produk_sumber</name><rename>kode_produk_sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>konstanta_1</name><rename>konstanta_1</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>250</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Lookup material_no (map_produk)</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>map_produk</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key><name>map_sumber</name><field>sumber</field><condition>=</condition><name2/></key><key><name>kode_produk_sumber</name><field>kode_produk_sumber</field><condition>=</condition><name2/></key>
+      <value><name>material_no</name><rename>material_no</rename><default>N/A</default><type>String</type></value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>440</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Lookup versi produk berlaku (SCD2)</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_produk</table>
+      <orderby>berlaku_sejak DESC</orderby>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key><name>material_no</name><field>material_no</field><condition>=</condition><name2/></key><key><name>tanggal</name><field>berlaku_sejak</field><condition>&lt;=</condition><name2/></key><key><name>tanggal</name><field>berlaku_sampai</field><condition>&gt;=</condition><name2/></key>
+      <value><name>produk_key</name><rename>produk_key</rename><default>-1</default><type>Integer</type></value><value><name>harga_pokok</name><rename>harga_pokok</rename><default/><type>Number</type></value><value><name>pemasok_key</name><rename>pemasok_key</rename><default>-1</default><type>Integer</type></value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>630</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Lookup kanal_key</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_kanal</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key><name>kanal_kode</name><field>kanal_kode</field><condition>=</condition><name2/></key>
+      <value><name>kanal_key</name><rename>kanal_key</rename><default>-1</default><type>Integer</type></value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>820</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Lookup pelanggan_key</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_pelanggan</table>
+      <orderby/>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key><name>buyer_hash</name><field>buyer_hash_mpl</field><condition>=</condition><name2/></key>
+      <value><name>pelanggan_key</name><rename>pelanggan_key</rename><default>-1</default><type>Integer</type></value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1010</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Lookup kampanye_key</name>
+    <type>DBLookup</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <cache>Y</cache>
+    <cache_load_all>N</cache_load_all>
+    <cache_size>0</cache_size>
+    <lookup>
+      <schema/>
+      <table>dim_kampanye</table>
+      <orderby>tanggal_mulai DESC</orderby>
+      <fail_on_multiple>N</fail_on_multiple>
+      <eat_row_on_failure>N</eat_row_on_failure>
+      <key><name>konstanta_1</name><field>berlaku_marketplace</field><condition>=</condition><name2/></key><key><name>tanggal</name><field>tanggal_mulai</field><condition>&lt;=</condition><name2/></key><key><name>tanggal</name><field>tanggal_selesai</field><condition>&gt;=</condition><name2/></key>
+      <value><name>kampanye_key</name><rename>kampanye_key</rename><default>-1</default><type>Integer</type></value>
+    </lookup>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1200</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Kunci default, HPP &amp; margin kotor</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+// item tanpa voucher -&gt; 'Tanpa Kampanye'; voucher di luar periode kampanye marketplace -&gt; -1
+if (diskon_rp == 0) kampanye_key = -2;
+
+// HPP dari versi harga pokok yang berlaku pada tanggal transaksi (NULL bila produk inferred)
+var hpp_satuan = harga_pokok == null ? null : r2(num(harga_pokok));
+var hpp = hpp_satuan == null ? null : r2(num(qty) * hpp_satuan);
+var margin_kotor = hpp == null ? null : r2(penjualan_netto - hpp - fee_komisi - fee_layanan);
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>kampanye_key</name><rename>kampanye_key</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>Y</replace></field><field><name>hpp_satuan</name><rename>hpp_satuan</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>hpp</name><rename>hpp</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>margin_kotor</name><rename>margin_kotor</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1390</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Tulis fact_penjualan</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <schema/>
+    <table>fact_penjualan</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields><field><column_name>tanggal_key</column_name><stream_name>tanggal_key</stream_name></field><field><column_name>produk_key</column_name><stream_name>produk_key</stream_name></field><field><column_name>pemasok_key</column_name><stream_name>pemasok_key</stream_name></field><field><column_name>kanal_key</column_name><stream_name>kanal_key</stream_name></field><field><column_name>pelanggan_key</column_name><stream_name>pelanggan_key</stream_name></field><field><column_name>kampanye_key</column_name><stream_name>kampanye_key</stream_name></field><field><column_name>sumber_sistem</column_name><stream_name>sumber_sistem</stream_name></field><field><column_name>nomor_transaksi</column_name><stream_name>nomor_transaksi</stream_name></field><field><column_name>line_id</column_name><stream_name>line_id</stream_name></field><field><column_name>kode_produk_sumber</column_name><stream_name>kode_produk_sumber</stream_name></field><field><column_name>waktu_transaksi_wib</column_name><stream_name>waktu_transaksi_wib</stream_name></field><field><column_name>metode_pembayaran</column_name><stream_name>metode_pembayaran</stream_name></field><field><column_name>qty</column_name><stream_name>qty</stream_name></field><field><column_name>harga_satuan_excl_ppn</column_name><stream_name>harga_satuan_excl_ppn</stream_name></field><field><column_name>penjualan_bruto</column_name><stream_name>penjualan_bruto</stream_name></field><field><column_name>diskon_rp</column_name><stream_name>diskon_rp</stream_name></field><field><column_name>penjualan_netto</column_name><stream_name>penjualan_netto</stream_name></field><field><column_name>hpp_satuan</column_name><stream_name>hpp_satuan</stream_name></field><field><column_name>hpp</column_name><stream_name>hpp</stream_name></field><field><column_name>fee_komisi</column_name><stream_name>fee_komisi</stream_name></field><field><column_name>fee_layanan</column_name><stream_name>fee_layanan</stream_name></field><field><column_name>margin_kotor</column_name><stream_name>margin_kotor</stream_name></field><field><column_name>qty_retur</column_name><stream_name>qty_retur</stream_name></field><field><column_name>nilai_retur</column_name><stream_name>nilai_retur</stream_name></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>1580</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step_error_handling>
+  </step_error_handling>
+  <slave-step-copy-partition-distribution>
+  </slave-step-copy-partition-distribution>
+  <slave_transformation>N</slave_transformation>
+</transformation>

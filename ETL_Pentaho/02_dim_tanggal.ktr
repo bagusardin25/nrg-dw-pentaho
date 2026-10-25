@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transformation>
+  <info>
+    <name>02_dim_tanggal</name>
+    <description>Membangkitkan dimensi tanggal 2021-01-01 s.d. 2024-12-31</description>
+    <extended_description/>
+    <trans_version/>
+    <trans_type>Normal</trans_type>
+    <trans_status>0</trans_status>
+    <directory>/</directory>
+    <parameters>
+    </parameters>
+    <size_rowset>10000</size_rowset>
+    <sleep_time_empty>50</sleep_time_empty>
+    <sleep_time_full>50</sleep_time_full>
+    <unique_connections>N</unique_connections>
+    <feedback_shown>Y</feedback_shown>
+    <feedback_size>50000</feedback_size>
+    <using_thread_priorities>Y</using_thread_priorities>
+    <shared_objects_file/>
+    <capture_step_performance>N</capture_step_performance>
+    <created_user>-</created_user>
+    <created_date>2026/10/25 12:00:00.000</created_date>
+    <modified_user>-</modified_user>
+    <modified_date>2026/10/25 12:00:00.000</modified_date>
+    <is_key_private>N</is_key_private>
+  </info>
+  <notepads>
+    <notepad>
+      <note>Dimensi tanggal (role: tanggal transaksi WIB). tanggal_key = yyyymmdd.
+Cakupan 2021-2024 melebihi rentang data (2022-01-01 s.d. 2023-03-31).</note>
+      <xloc>60</xloc>
+      <yloc>10</yloc>
+      <width>520</width>
+      <heigth>40</heigth>
+      <fontname>Segoe UI</fontname>
+      <fontsize>9</fontsize>
+      <fontbold>N</fontbold>
+      <fontitalic>N</fontitalic>
+      <fontcolorred>0</fontcolorred>
+      <fontcolorgreen>0</fontcolorgreen>
+      <fontcolorblue>0</fontcolorblue>
+      <backgroundcolorred>255</backgroundcolorred>
+      <backgroundcolorgreen>244</backgroundcolorgreen>
+      <backgroundcolorblue>204</backgroundcolorblue>
+      <bordercolorred>100</bordercolorred>
+      <bordercolorgreen>100</bordercolorgreen>
+      <bordercolorblue>100</bordercolorblue>
+      <drawshadow>N</drawshadow>
+    </notepad>
+  </notepads>
+  <connection>
+    <name>conn_nrg_ecom</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>nrg_ecom</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes><attribute><code>EXTRA_OPTION_MYSQL.useSSL</code><attribute>false</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.allowPublicKeyRetrieval</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.characterEncoding</code><attribute>UTF-8</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute><attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute><attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute><attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute><attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute><attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>USE_POOLING</code><attribute>N</attribute></attribute></attributes>
+  </connection>
+  <connection>
+    <name>conn_nrg_dw</name>
+    <server>localhost</server>
+    <type>MYSQL</type>
+    <access>Native</access>
+    <database>nrg_dw</database>
+    <port>3306</port>
+    <username>root</username>
+    <password>Encrypted </password>
+    <servername/>
+    <data_tablespace/>
+    <index_tablespace/>
+    <attributes><attribute><code>EXTRA_OPTION_MYSQL.useSSL</code><attribute>false</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.allowPublicKeyRetrieval</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.characterEncoding</code><attribute>UTF-8</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.rewriteBatchedStatements</code><attribute>true</attribute></attribute><attribute><code>EXTRA_OPTION_MYSQL.createDatabaseIfNotExist</code><attribute>true</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_LOWERCASE</code><attribute>N</attribute></attribute><attribute><code>FORCE_IDENTIFIERS_TO_UPPERCASE</code><attribute>N</attribute></attribute><attribute><code>IS_CLUSTERED</code><attribute>N</attribute></attribute><attribute><code>PORT_NUMBER</code><attribute>3306</attribute></attribute><attribute><code>PRESERVE_RESERVED_WORD_CASE</code><attribute>Y</attribute></attribute><attribute><code>QUOTE_ALL_FIELDS</code><attribute>N</attribute></attribute><attribute><code>STREAM_RESULTS</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_BOOLEAN_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>SUPPORTS_TIMESTAMP_DATA_TYPE</code><attribute>Y</attribute></attribute><attribute><code>USE_POOLING</code><attribute>N</attribute></attribute></attributes>
+  </connection>
+  <order>
+    <hop>
+      <from>Bangkitkan 1461 hari</from>
+      <to>Nomor hari ke-n</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Nomor hari ke-n</from>
+      <to>Hitung atribut tanggal</to>
+      <enabled>Y</enabled>
+    </hop>
+    <hop>
+      <from>Hitung atribut tanggal</from>
+      <to>Tulis dim_tanggal</to>
+      <enabled>Y</enabled>
+    </hop>
+  </order>
+  <step>
+    <name>Bangkitkan 1461 hari</name>
+    <type>RowGenerator</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <fields><field><name>tgl_awal</name><type>Date</type><format>yyyy-MM-dd</format><currency/><decimal/><group/><nullif>2021-01-01</nullif><length>-1</length><precision>-1</precision><set_empty_string>N</set_empty_string></field></fields>
+    <limit>1461</limit>
+    <never_ending>N</never_ending>
+    <interval_in_ms>5000</interval_in_ms>
+    <row_time_field>now</row_time_field>
+    <last_time_field>FiveSecondsAgo</last_time_field>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>60</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Nomor hari ke-n</name>
+    <type>Sequence</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <valuename>hari_ke</valuename>
+    <use_database>N</use_database>
+    <connection/>
+    <schema/>
+    <seqname>SEQ_</seqname>
+    <use_counter>Y</use_counter>
+    <counter_name/>
+    <start_at>0</start_at>
+    <increment_by>1</increment_by>
+    <max_value>999999999</max_value>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>250</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Hitung atribut tanggal</name>
+    <type>ScriptValueMod</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Transform</jsScript_name>
+        <jsScript_script>
+var tanggal = dateAdd(tgl_awal, 'd', hari_ke);
+var tanggal_key = dateKey(tanggal);
+var tahun = parseInt(date2str(tanggal, 'yyyy'), 10);
+var bulan = parseInt(date2str(tanggal, 'MM'), 10);
+var hari_dalam_bulan = parseInt(date2str(tanggal, 'dd'), 10);
+var hari_dalam_minggu = parseInt(date2str(tanggal, 'u'), 10);
+var minggu_dalam_tahun = parseInt(date2str(tanggal, 'w'), 10);
+var NAMA_HARI = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+var NAMA_BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+var nama_hari = NAMA_HARI[hari_dalam_minggu - 1];
+var is_akhir_pekan = hari_dalam_minggu &gt;= 6 ? 1 : 0;
+var nama_bulan = NAMA_BULAN[bulan - 1];
+var kuartal = Math.floor((bulan - 1) / 3) + 1;
+var nama_kuartal = 'Q' + kuartal;
+var tahun_bulan = date2str(tanggal, 'yyyy-MM');
+var tahun_kuartal = tahun + '-Q' + kuartal;
+</jsScript_script>
+      </jsScript>
+      <jsScript>
+        <jsScript_type>1</jsScript_type>
+        <jsScript_name>Fungsi_bantu</jsScript_name>
+        <jsScript_script>
+// ---- fungsi bantu (dijalankan sekali saat step mulai) ----
+var PPN = 1.11;
+function trimStr(s) {
+  if (s == null) return null;
+  var t = String(s).replace(/^\s+|\s+$/g, '').replace(/\s+/g, ' ');
+  return t.length == 0 ? null : t;
+}
+function upperStr(s) { var t = trimStr(s); return t == null ? null : t.toUpperCase(); }
+function properStr(s) {
+  var t = trimStr(s); if (t == null) return null;
+  return t.toLowerCase().replace(/(^|[\s.,'-])([a-z])/g, function (m, p, c) { return p + c.toUpperCase(); });
+}
+function num(x) { return x == null ? null : parseFloat(String(x)); }
+function r2(x) { return x == null ? null : Math.round(x * 100) / 100; }
+// Normalisasi nomor HP ke format 08xxxxxxxx: buang non-digit, 62xxx -&gt; 0xxx, 8xxx -&gt; 08xxx
+function normHp(s) {
+  if (s == null) return null;
+  var d = String(s).replace(/[^0-9]/g, '');
+  if (d.indexOf('62') == 0) d = '0' + d.substring(2);
+  else if (d.indexOf('8') == 0) d = '0' + d;
+  return d.length == 0 ? null : d;
+}
+function truncDate(d) { return d == null ? null : str2date(date2str(d, 'yyyy-MM-dd'), 'yyyy-MM-dd'); }
+function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd'), 10); }
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields><field><name>tanggal</name><rename>tanggal</rename><type>Date</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>tanggal_key</name><rename>tanggal_key</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>tahun</name><rename>tahun</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>bulan</name><rename>bulan</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>hari_dalam_bulan</name><rename>hari_dalam_bulan</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>hari_dalam_minggu</name><rename>hari_dalam_minggu</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>minggu_dalam_tahun</name><rename>minggu_dalam_tahun</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nama_hari</name><rename>nama_hari</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>is_akhir_pekan</name><rename>is_akhir_pekan</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nama_bulan</name><rename>nama_bulan</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kuartal</name><rename>kuartal</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nama_kuartal</name><rename>nama_kuartal</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>tahun_bulan</name><rename>tahun_bulan</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>tahun_kuartal</name><rename>tahun_kuartal</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>440</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>Tulis dim_tanggal</name>
+    <type>TableOutput</type>
+    <description/>
+    <distribute>Y</distribute>
+    <custom_distribution/>
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name/>
+    </partitioning>
+    <connection>conn_nrg_dw</connection>
+    <schema/>
+    <table>dim_tanggal</table>
+    <commit>1000</commit>
+    <truncate>N</truncate>
+    <ignore_errors>N</ignore_errors>
+    <use_batch>Y</use_batch>
+    <specify_fields>Y</specify_fields>
+    <partitioning_enabled>N</partitioning_enabled>
+    <partitioning_field/>
+    <partitioning_daily>N</partitioning_daily>
+    <partitioning_monthly>Y</partitioning_monthly>
+    <tablename_in_field>N</tablename_in_field>
+    <tablename_field/>
+    <tablename_in_table>Y</tablename_in_table>
+    <return_keys>N</return_keys>
+    <return_field/>
+    <fields><field><column_name>tanggal_key</column_name><stream_name>tanggal_key</stream_name></field><field><column_name>tanggal</column_name><stream_name>tanggal</stream_name></field><field><column_name>hari_dalam_bulan</column_name><stream_name>hari_dalam_bulan</stream_name></field><field><column_name>hari_dalam_minggu</column_name><stream_name>hari_dalam_minggu</stream_name></field><field><column_name>nama_hari</column_name><stream_name>nama_hari</stream_name></field><field><column_name>is_akhir_pekan</column_name><stream_name>is_akhir_pekan</stream_name></field><field><column_name>minggu_dalam_tahun</column_name><stream_name>minggu_dalam_tahun</stream_name></field><field><column_name>bulan</column_name><stream_name>bulan</stream_name></field><field><column_name>nama_bulan</column_name><stream_name>nama_bulan</stream_name></field><field><column_name>kuartal</column_name><stream_name>kuartal</stream_name></field><field><column_name>nama_kuartal</column_name><stream_name>nama_kuartal</stream_name></field><field><column_name>tahun</column_name><stream_name>tahun</stream_name></field><field><column_name>tahun_bulan</column_name><stream_name>tahun_bulan</stream_name></field><field><column_name>tahun_kuartal</column_name><stream_name>tahun_kuartal</stream_name></field></fields>
+    <attributes/>
+    <cluster_schema/>
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>630</xloc>
+      <yloc>170</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step_error_handling>
+  </step_error_handling>
+  <slave-step-copy-partition-distribution>
+  </slave-step-copy-partition-distribution>
+  <slave_transformation>N</slave_transformation>
+</transformation>
