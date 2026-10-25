@@ -22,9 +22,9 @@ WITH margin_kuartal AS (
            SUM(f.penjualan_netto) AS penjualan_netto,
            SUM(f.margin_kotor)    AS margin_kotor
     FROM fact_penjualan f
-    JOIN dim_produk  p ON p.produk_key  = f.produk_key
-    JOIN dim_kanal   k ON k.kanal_key   = f.kanal_key
-    JOIN dim_tanggal d ON d.tanggal_key = f.tanggal_key
+    JOIN dim_produk  p ON p.id_produk  = f.id_produk
+    JOIN dim_kanal   k ON k.id_kanal   = f.id_kanal
+    JOIN dim_tanggal d ON d.id_tanggal = f.id_tanggal
     WHERE f.margin_kotor IS NOT NULL
     GROUP BY p.kategori, p.sub_kategori, k.jenis_kanal, d.tahun, d.kuartal
 )

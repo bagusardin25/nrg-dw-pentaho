@@ -18,23 +18,23 @@
 USE nrg_dw;
 
 WITH kampanye AS (
-    SELECT kampanye_key, kode_promo, nama_kampanye, kanal_kampanye,
+    SELECT id_kampanye, kode_promo, nama_kampanye, kanal_kampanye,
            berlaku_web, berlaku_toko, berlaku_marketplace,
            tanggal_mulai, tanggal_selesai, durasi_hari, target_diskon_persen,
            DATE_SUB(tanggal_mulai, INTERVAL durasi_hari DAY) AS pembanding_mulai,
            DATE_SUB(tanggal_mulai, INTERVAL 1 DAY)           AS pembanding_selesai
     FROM dim_kampanye
-    WHERE kampanye_key > 0
+    WHERE id_kampanye > 0
 ),
 penjualan AS (
     SELECT d.tanggal, k.jenis_kanal, f.qty, f.penjualan_netto, f.diskon_rp, f.margin_kotor
     FROM fact_penjualan f
-    JOIN dim_tanggal d ON d.tanggal_key = f.tanggal_key
-    JOIN dim_kanal   k ON k.kanal_key   = f.kanal_key
+    JOIN dim_tanggal d ON d.id_tanggal = f.id_tanggal
+    JOIN dim_kanal   k ON k.id_kanal   = f.id_kanal
     WHERE f.margin_kotor IS NOT NULL
 ),
 ringkas AS (
-    SELECT c.kampanye_key,
+    SELECT c.id_kampanye,
            SUM(CASE WHEN p.tanggal >= c.tanggal_mulai THEN p.qty END)             AS qty_kampanye,
            SUM(CASE WHEN p.tanggal <  c.tanggal_mulai THEN p.qty END)             AS qty_pembanding,
            SUM(CASE WHEN p.tanggal >= c.tanggal_mulai THEN p.penjualan_netto END) AS netto_kampanye,
@@ -48,7 +48,7 @@ ringkas AS (
      AND (   (c.berlaku_web = 1         AND p.jenis_kanal = 'Situs Web')
           OR (c.berlaku_toko = 1        AND p.jenis_kanal = 'Toko Fisik')
           OR (c.berlaku_marketplace = 1 AND p.jenis_kanal = 'Marketplace'))
-    GROUP BY c.kampanye_key
+    GROUP BY c.id_kampanye
 ),
 hasil AS (
     SELECT c.kode_promo, c.nama_kampanye, c.kanal_kampanye, c.tanggal_mulai, c.tanggal_selesai,
@@ -61,7 +61,7 @@ hasil AS (
            100 * r.margin_kampanye   / NULLIF(r.netto_kampanye, 0)      AS margin_pct_kampanye,
            r.diskon_kampanye
     FROM kampanye c
-    JOIN ringkas r ON r.kampanye_key = c.kampanye_key
+    JOIN ringkas r ON r.id_kampanye = c.id_kampanye
 )
 SELECT kode_promo, nama_kampanye, kanal_kampanye, tanggal_mulai, tanggal_selesai, durasi_hari,
        target_diskon_persen,

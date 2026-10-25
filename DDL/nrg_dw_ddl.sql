@@ -107,7 +107,7 @@ CREATE TABLE err_kampanye (
 -- ---------------------------------------------------------------------
 
 CREATE TABLE dim_tanggal (
-  tanggal_key        INT          NOT NULL,          -- yyyymmdd
+  id_tanggal        INT          NOT NULL,          -- yyyymmdd
   tanggal            DATE         NOT NULL,
   hari_dalam_bulan   TINYINT,
   hari_dalam_minggu  TINYINT,                        -- 1 = Senin ... 7 = Minggu
@@ -121,12 +121,12 @@ CREATE TABLE dim_tanggal (
   tahun              SMALLINT,
   tahun_bulan        VARCHAR(7),                     -- 2022-01
   tahun_kuartal      VARCHAR(7),                     -- 2022-Q1
-  PRIMARY KEY (tanggal_key),
+  PRIMARY KEY (id_tanggal),
   UNIQUE KEY uk_tanggal (tanggal)
 ) ENGINE = InnoDB;
 
 CREATE TABLE dim_kanal (
-  kanal_key      INT          NOT NULL AUTO_INCREMENT,
+  id_kanal      INT          NOT NULL AUTO_INCREMENT,
   kanal_kode     VARCHAR(30)  NOT NULL,              -- WEB / TSxx / marketplace_a / marketplace_b
   jenis_kanal    VARCHAR(20)  NOT NULL,              -- Situs Web / Toko Fisik / Marketplace
   platform       VARCHAR(50),
@@ -136,23 +136,23 @@ CREATE TABLE dim_kanal (
   kota           VARCHAR(60),
   provinsi       VARCHAR(60),
   tanggal_buka   DATE,
-  PRIMARY KEY (kanal_key),
+  PRIMARY KEY (id_kanal),
   UNIQUE KEY uk_kanal_kode (kanal_kode)
 ) ENGINE = InnoDB;
 
 CREATE TABLE dim_pemasok (
-  pemasok_key    INT          NOT NULL AUTO_INCREMENT,
+  id_pemasok    INT          NOT NULL AUTO_INCREMENT,
   kode_pemasok   VARCHAR(20)  NOT NULL,
   nama_pemasok   VARCHAR(150) NOT NULL,
   kota           VARCHAR(60),
   kontak         VARCHAR(30),
-  PRIMARY KEY (pemasok_key),
+  PRIMARY KEY (id_pemasok),
   UNIQUE KEY uk_kode_pemasok (kode_pemasok)
 ) ENGINE = InnoDB;
 
 -- SCD Tipe 2: satu baris per versi harga pokok (berlaku_sejak s.d. berlaku_sampai)
 CREATE TABLE dim_produk (
-  produk_key      INT           NOT NULL AUTO_INCREMENT,
+  id_produk      INT           NOT NULL AUTO_INCREMENT,
   material_no     VARCHAR(40)   NOT NULL,
   nama_produk     VARCHAR(200),
   merk            VARCHAR(60),
@@ -160,7 +160,7 @@ CREATE TABLE dim_produk (
   sub_kategori    VARCHAR(60),
   harga_pokok     DECIMAL(15,2),                     -- NULL untuk inferred member
   status_produk   VARCHAR(20),
-  pemasok_key     INT,
+  id_pemasok     INT,
   nama_pemasok    VARCHAR(150),
   versi           INT,
   berlaku_sejak   DATE          NOT NULL,
@@ -168,7 +168,7 @@ CREATE TABLE dim_produk (
   is_current      TINYINT       NOT NULL DEFAULT 1,
   is_inferred     TINYINT       NOT NULL DEFAULT 0,  -- 1 = late arriving dimension
   sumber_data     VARCHAR(30),
-  PRIMARY KEY (produk_key),
+  PRIMARY KEY (id_produk),
   UNIQUE KEY uk_material_versi (material_no, berlaku_sejak),
   KEY idx_material_periode (material_no, berlaku_sejak, berlaku_sampai)
 ) ENGINE = InnoDB;
@@ -176,7 +176,7 @@ CREATE TABLE dim_produk (
 -- Pelanggan terpadu: pelanggan web (S1) dan member toko (S2) digabung
 -- berdasarkan nomor HP yang dinormalkan; pembeli marketplace (S3) per buyer.hash
 CREATE TABLE dim_pelanggan (
-  pelanggan_key          INT          NOT NULL AUTO_INCREMENT,
+  id_pelanggan          INT          NOT NULL AUTO_INCREMENT,
   pelanggan_nk           VARCHAR(60)  NOT NULL,      -- HP:08xxxx / MPL:<hash> / default
   jenis_pelanggan        VARCHAR(40),
   nama                   VARCHAR(150),
@@ -192,7 +192,7 @@ CREATE TABLE dim_pelanggan (
   is_pembeli_marketplace TINYINT      NOT NULL DEFAULT 0,
   tgl_registrasi_web     DATE,
   tgl_join_member        DATE,
-  PRIMARY KEY (pelanggan_key),
+  PRIMARY KEY (id_pelanggan),
   UNIQUE KEY uk_pelanggan_nk (pelanggan_nk),
   UNIQUE KEY uk_hp (no_hp_norm),
   KEY idx_id_web (id_pelanggan_web),
@@ -201,7 +201,7 @@ CREATE TABLE dim_pelanggan (
 ) ENGINE = InnoDB;
 
 CREATE TABLE dim_kampanye (
-  kampanye_key          INT          NOT NULL AUTO_INCREMENT,
+  id_kampanye          INT          NOT NULL AUTO_INCREMENT,
   kode_promo            VARCHAR(50)  NOT NULL,
   nama_kampanye         VARCHAR(150),
   jenis_promo           VARCHAR(50),
@@ -214,7 +214,7 @@ CREATE TABLE dim_kampanye (
   durasi_hari           INT,
   target_diskon_persen  DECIMAL(5,2),
   pic                   VARCHAR(100),
-  PRIMARY KEY (kampanye_key),
+  PRIMARY KEY (id_kampanye),
   UNIQUE KEY uk_kampanye (kode_promo, tanggal_mulai)
 ) ENGINE = InnoDB;
 
@@ -224,13 +224,13 @@ CREATE TABLE dim_kampanye (
 --   Semua nilai rupiah TANPA PPN, semua waktu dalam WIB
 -- ---------------------------------------------------------------------
 CREATE TABLE fact_penjualan (
-  fact_key               BIGINT        NOT NULL AUTO_INCREMENT,
-  tanggal_key            INT           NOT NULL,
-  produk_key             INT           NOT NULL,
-  pemasok_key            INT           NOT NULL,
-  kanal_key              INT           NOT NULL,
-  pelanggan_key          INT           NOT NULL,
-  kampanye_key           INT           NOT NULL,
+  id_penjualan               BIGINT        NOT NULL AUTO_INCREMENT,
+  id_tanggal            INT           NOT NULL,
+  id_produk             INT           NOT NULL,
+  id_pemasok            INT           NOT NULL,
+  id_kanal              INT           NOT NULL,
+  id_pelanggan          INT           NOT NULL,
+  id_kampanye           INT           NOT NULL,
   -- degenerate dimension / atribut lineage
   sumber_sistem          VARCHAR(5)    NOT NULL,     -- S1 / S2 / S3
   nomor_transaksi        VARCHAR(50)   NOT NULL,     -- order_id / trx_no / invoice
@@ -251,19 +251,19 @@ CREATE TABLE fact_penjualan (
   margin_kotor           DECIMAL(15,2),              -- netto - hpp - fee_komisi - fee_layanan
   qty_retur              INT,
   nilai_retur            DECIMAL(15,2),
-  PRIMARY KEY (fact_key),
+  PRIMARY KEY (id_penjualan),
   UNIQUE KEY uk_fact_line (sumber_sistem, nomor_transaksi, line_id),
-  KEY idx_fact_tanggal (tanggal_key),
-  KEY idx_fact_produk (produk_key),
-  KEY idx_fact_kanal (kanal_key),
-  KEY idx_fact_pelanggan (pelanggan_key),
-  KEY idx_fact_kampanye (kampanye_key),
-  CONSTRAINT fk_fact_tanggal   FOREIGN KEY (tanggal_key)   REFERENCES dim_tanggal (tanggal_key),
-  CONSTRAINT fk_fact_produk    FOREIGN KEY (produk_key)    REFERENCES dim_produk (produk_key),
-  CONSTRAINT fk_fact_pemasok   FOREIGN KEY (pemasok_key)   REFERENCES dim_pemasok (pemasok_key),
-  CONSTRAINT fk_fact_kanal     FOREIGN KEY (kanal_key)     REFERENCES dim_kanal (kanal_key),
-  CONSTRAINT fk_fact_pelanggan FOREIGN KEY (pelanggan_key) REFERENCES dim_pelanggan (pelanggan_key),
-  CONSTRAINT fk_fact_kampanye  FOREIGN KEY (kampanye_key)  REFERENCES dim_kampanye (kampanye_key)
+  KEY idx_fact_tanggal (id_tanggal),
+  KEY idx_fact_produk (id_produk),
+  KEY idx_fact_kanal (id_kanal),
+  KEY idx_fact_pelanggan (id_pelanggan),
+  KEY idx_fact_kampanye (id_kampanye),
+  CONSTRAINT fk_fact_tanggal   FOREIGN KEY (id_tanggal)   REFERENCES dim_tanggal (id_tanggal),
+  CONSTRAINT fk_fact_produk    FOREIGN KEY (id_produk)    REFERENCES dim_produk (id_produk),
+  CONSTRAINT fk_fact_pemasok   FOREIGN KEY (id_pemasok)   REFERENCES dim_pemasok (id_pemasok),
+  CONSTRAINT fk_fact_kanal     FOREIGN KEY (id_kanal)     REFERENCES dim_kanal (id_kanal),
+  CONSTRAINT fk_fact_pelanggan FOREIGN KEY (id_pelanggan) REFERENCES dim_pelanggan (id_pelanggan),
+  CONSTRAINT fk_fact_kampanye  FOREIGN KEY (id_kampanye)  REFERENCES dim_kampanye (id_kampanye)
 ) ENGINE = InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -271,22 +271,22 @@ CREATE TABLE fact_penjualan (
 --   -1 = tidak dikenal / tidak terpetakan
 --   -2 = bukan member / tanpa kampanye
 -- ---------------------------------------------------------------------
-INSERT INTO dim_produk (produk_key, material_no, nama_produk, merk, kategori, sub_kategori,
-                        harga_pokok, status_produk, pemasok_key, nama_pemasok, versi,
+INSERT INTO dim_produk (id_produk, material_no, nama_produk, merk, kategori, sub_kategori,
+                        harga_pokok, status_produk, id_pemasok, nama_pemasok, versi,
                         berlaku_sejak, berlaku_sampai, is_current, is_inferred, sumber_data)
 VALUES (-1, 'N/A', 'Produk Tidak Dikenal', 'N/A', 'N/A', 'N/A',
         NULL, 'N/A', -1, 'N/A', 0, '1900-01-01', '9999-12-31', 1, 0, 'DEFAULT');
 
-INSERT INTO dim_pemasok (pemasok_key, kode_pemasok, nama_pemasok, kota, kontak)
+INSERT INTO dim_pemasok (id_pemasok, kode_pemasok, nama_pemasok, kota, kontak)
 VALUES (-1, 'N/A', 'Pemasok Tidak Dikenal', 'N/A', NULL);
 
-INSERT INTO dim_kanal (kanal_key, kanal_kode, jenis_kanal, platform, kota)
+INSERT INTO dim_kanal (id_kanal, kanal_kode, jenis_kanal, platform, kota)
 VALUES (-1, 'N/A', 'Tidak Dikenal', 'N/A', 'N/A');
 
-INSERT INTO dim_pelanggan (pelanggan_key, pelanggan_nk, jenis_pelanggan, nama)
+INSERT INTO dim_pelanggan (id_pelanggan, pelanggan_nk, jenis_pelanggan, nama)
 VALUES (-1, 'N/A', 'Tidak Dikenal', 'Pelanggan Tidak Dikenal'),
        (-2, 'NON-MEMBER', 'Non-Member Toko', 'Pembeli Toko Non-Member');
 
-INSERT INTO dim_kampanye (kampanye_key, kode_promo, nama_kampanye, jenis_promo, kanal_kampanye)
+INSERT INTO dim_kampanye (id_kampanye, kode_promo, nama_kampanye, jenis_promo, kanal_kampanye)
 VALUES (-1, 'TIDAK TERIDENTIFIKASI', 'Diskon di luar kampanye valid / kampanye gagal validasi', 'N/A', 'N/A'),
        (-2, 'TANPA KAMPANYE', 'Tanpa Kampanye / Tanpa Diskon', 'N/A', 'N/A');

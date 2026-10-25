@@ -1,6 +1,6 @@
 # Data Warehouse NRG (Nusantara Retail Group) – Tugas Kelompok 1
 
-**Kelompok 7**
+**Kelompok 7** · Repositori: https://github.com/bagusardin25/nrg-dw-pentaho
 
 | Nama | NIM |
 |---|---|
@@ -16,13 +16,15 @@ menggunakan **Pentaho Data Integration 9.3** dan **MySQL 8.4 (Laragon)**.
 
 | Folder / berkas | Isi |
 |---|---|
-| `Dokumen_Desain/NRG_Dokumen_Desain_Dimensional.docx` | Dokumen desain dimensional (3.1): star schema, grain & aturan, peta source-to-target, kualitas data, pipeline, hasil kueri |
 | `Dokumen_Desain/star_schema_nrg_dw.png` | Diagram star schema |
 | `DDL/nrg_dw_ddl.sql` | DDL data warehouse `nrg_dw` (dijalankan otomatis oleh job) |
 | `ETL_Pentaho/00_job_nrg_dw.kjb` | Job utama (DDL → 12 transformation) |
 | `ETL_Pentaho/01..12_*.ktr` | Transformation Pentaho |
 | `Query/Q1..Q4_*.sql` | Empat kueri pembuktian |
 | `Data_Sumber/` | Paket data sumber (tidak diubah) |
+
+Dokumen desain dimensional / laporan (.docx dan .pdf) tidak disimpan di repositori ini; dokumen tersebut
+dikumpulkan bersama arsip pengumpulan di LMS.
 
 ## Koneksi database (sudah tertanam di setiap .ktr/.kjb)
 

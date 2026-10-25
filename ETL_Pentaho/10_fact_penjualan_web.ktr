@@ -105,21 +105,21 @@ Kampanye: voucher order -&gt; (promo_code, valid_from) dicocokkan ke dim_kampany
     </hop>
     <hop>
       <from>Lookup versi produk berlaku (SCD2)</from>
-      <to>Lookup kanal_key</to>
+      <to>Lookup id_kanal</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Lookup kanal_key</from>
-      <to>Lookup pelanggan_key</to>
+      <from>Lookup id_kanal</from>
+      <to>Lookup id_pelanggan</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Lookup pelanggan_key</from>
-      <to>Lookup kampanye_key</to>
+      <from>Lookup id_pelanggan</from>
+      <to>Lookup id_kampanye</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Lookup kampanye_key</from>
+      <from>Lookup id_kampanye</from>
       <to>Kunci default, HPP &amp; margin kotor</to>
       <enabled>Y</enabled>
     </hop>
@@ -259,7 +259,7 @@ var fee_layanan = 0;
 // order_ts S1 sudah dalam WIB
 var waktu_transaksi_wib = order_ts;
 var tanggal = truncDate(order_ts);
-var tanggal_key = dateKey(tanggal);
+var id_tanggal = dateKey(tanggal);
 // retur hanya dihitung bila disetujui
 var qty_retur = retur_status_src == 'DISETUJUI' ? num(retur_qty_src) : 0;
 var nilai_retur = retur_status_src == 'DISETUJUI' ? r2(num(retur_refund_src) / PPN) : 0;
@@ -304,7 +304,7 @@ function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd')
 </jsScript_script>
       </jsScript>
     </jsScripts>
-    <fields><field><name>harga_satuan_excl_ppn</name><rename>harga_satuan_excl_ppn</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>penjualan_bruto</name><rename>penjualan_bruto</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>diskon_rp</name><rename>diskon_rp</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>penjualan_netto</name><rename>penjualan_netto</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>fee_komisi</name><rename>fee_komisi</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>fee_layanan</name><rename>fee_layanan</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>waktu_transaksi_wib</name><rename>waktu_transaksi_wib</rename><type>Date</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>tanggal</name><rename>tanggal</rename><type>Date</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>tanggal_key</name><rename>tanggal_key</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>qty_retur</name><rename>qty_retur</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nilai_retur</name><rename>nilai_retur</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kode_promo_norm</name><rename>kode_promo_norm</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>sumber_sistem</name><rename>sumber_sistem</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>map_sumber</name><rename>map_sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kanal_kode</name><rename>kanal_kode</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nomor_transaksi</name><rename>nomor_transaksi</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>line_id</name><rename>line_id</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kode_produk_sumber</name><rename>kode_produk_sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>metode_pembayaran</name><rename>metode_pembayaran</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <fields><field><name>harga_satuan_excl_ppn</name><rename>harga_satuan_excl_ppn</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>penjualan_bruto</name><rename>penjualan_bruto</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>diskon_rp</name><rename>diskon_rp</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>penjualan_netto</name><rename>penjualan_netto</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>fee_komisi</name><rename>fee_komisi</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>fee_layanan</name><rename>fee_layanan</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>waktu_transaksi_wib</name><rename>waktu_transaksi_wib</rename><type>Date</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>tanggal</name><rename>tanggal</rename><type>Date</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>id_tanggal</name><rename>id_tanggal</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>qty_retur</name><rename>qty_retur</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nilai_retur</name><rename>nilai_retur</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kode_promo_norm</name><rename>kode_promo_norm</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>sumber_sistem</name><rename>sumber_sistem</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>map_sumber</name><rename>map_sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kanal_kode</name><rename>kanal_kode</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>nomor_transaksi</name><rename>nomor_transaksi</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>line_id</name><rename>line_id</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>kode_produk_sumber</name><rename>kode_produk_sumber</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>metode_pembayaran</name><rename>metode_pembayaran</rename><type>String</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -379,7 +379,7 @@ function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd')
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
       <key><name>material_no</name><field>material_no</field><condition>=</condition><name2/></key><key><name>tanggal</name><field>berlaku_sejak</field><condition>&lt;=</condition><name2/></key><key><name>tanggal</name><field>berlaku_sampai</field><condition>&gt;=</condition><name2/></key>
-      <value><name>produk_key</name><rename>produk_key</rename><default>-1</default><type>Integer</type></value><value><name>harga_pokok</name><rename>harga_pokok</rename><default/><type>Number</type></value><value><name>pemasok_key</name><rename>pemasok_key</rename><default>-1</default><type>Integer</type></value>
+      <value><name>id_produk</name><rename>id_produk</rename><default>-1</default><type>Integer</type></value><value><name>harga_pokok</name><rename>harga_pokok</rename><default/><type>Number</type></value><value><name>id_pemasok</name><rename>id_pemasok</rename><default>-1</default><type>Integer</type></value>
     </lookup>
     <attributes/>
     <cluster_schema/>
@@ -396,7 +396,7 @@ function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd')
     </GUI>
   </step>
   <step>
-    <name>Lookup kanal_key</name>
+    <name>Lookup id_kanal</name>
     <type>DBLookup</type>
     <description/>
     <distribute>Y</distribute>
@@ -417,7 +417,7 @@ function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd')
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
       <key><name>kanal_kode</name><field>kanal_kode</field><condition>=</condition><name2/></key>
-      <value><name>kanal_key</name><rename>kanal_key</rename><default>-1</default><type>Integer</type></value>
+      <value><name>id_kanal</name><rename>id_kanal</rename><default>-1</default><type>Integer</type></value>
     </lookup>
     <attributes/>
     <cluster_schema/>
@@ -434,7 +434,7 @@ function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd')
     </GUI>
   </step>
   <step>
-    <name>Lookup pelanggan_key</name>
+    <name>Lookup id_pelanggan</name>
     <type>DBLookup</type>
     <description/>
     <distribute>Y</distribute>
@@ -455,7 +455,7 @@ function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd')
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
       <key><name>customer_id</name><field>id_pelanggan_web</field><condition>=</condition><name2/></key>
-      <value><name>pelanggan_key</name><rename>pelanggan_key</rename><default>-1</default><type>Integer</type></value>
+      <value><name>id_pelanggan</name><rename>id_pelanggan</rename><default>-1</default><type>Integer</type></value>
     </lookup>
     <attributes/>
     <cluster_schema/>
@@ -472,7 +472,7 @@ function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd')
     </GUI>
   </step>
   <step>
-    <name>Lookup kampanye_key</name>
+    <name>Lookup id_kampanye</name>
     <type>DBLookup</type>
     <description/>
     <distribute>Y</distribute>
@@ -493,7 +493,7 @@ function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd')
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
       <key><name>kode_promo_norm</name><field>kode_promo</field><condition>=</condition><name2/></key><key><name>voucher_valid_from</name><field>tanggal_mulai</field><condition>=</condition><name2/></key>
-      <value><name>kampanye_key</name><rename>kampanye_key</rename><default>-1</default><type>Integer</type></value>
+      <value><name>id_kampanye</name><rename>id_kampanye</rename><default>-1</default><type>Integer</type></value>
     </lookup>
     <attributes/>
     <cluster_schema/>
@@ -528,7 +528,7 @@ function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd')
         <jsScript_name>Transform</jsScript_name>
         <jsScript_script>
 // order tanpa voucher -&gt; 'Tanpa Kampanye'; voucher yang kampanyenya gagal validasi S5 -&gt; -1 (default lookup)
-if (voucher_id == null) kampanye_key = -2;
+if (voucher_id == null) id_kampanye = -2;
 
 // HPP dari versi harga pokok yang berlaku pada tanggal transaksi (NULL bila produk inferred)
 var hpp_satuan = harga_pokok == null ? null : r2(num(harga_pokok));
@@ -567,7 +567,7 @@ function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd')
 </jsScript_script>
       </jsScript>
     </jsScripts>
-    <fields><field><name>kampanye_key</name><rename>kampanye_key</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>Y</replace></field><field><name>hpp_satuan</name><rename>hpp_satuan</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>hpp</name><rename>hpp</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>margin_kotor</name><rename>margin_kotor</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
+    <fields><field><name>id_kampanye</name><rename>id_kampanye</rename><type>Integer</type><length>-1</length><precision>-1</precision><replace>Y</replace></field><field><name>hpp_satuan</name><rename>hpp_satuan</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>hpp</name><rename>hpp</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field><field><name>margin_kotor</name><rename>margin_kotor</rename><type>Number</type><length>-1</length><precision>-1</precision><replace>N</replace></field></fields>
     <attributes/>
     <cluster_schema/>
     <remotesteps>
@@ -610,7 +610,7 @@ function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd')
     <tablename_in_table>Y</tablename_in_table>
     <return_keys>N</return_keys>
     <return_field/>
-    <fields><field><column_name>tanggal_key</column_name><stream_name>tanggal_key</stream_name></field><field><column_name>produk_key</column_name><stream_name>produk_key</stream_name></field><field><column_name>pemasok_key</column_name><stream_name>pemasok_key</stream_name></field><field><column_name>kanal_key</column_name><stream_name>kanal_key</stream_name></field><field><column_name>pelanggan_key</column_name><stream_name>pelanggan_key</stream_name></field><field><column_name>kampanye_key</column_name><stream_name>kampanye_key</stream_name></field><field><column_name>sumber_sistem</column_name><stream_name>sumber_sistem</stream_name></field><field><column_name>nomor_transaksi</column_name><stream_name>nomor_transaksi</stream_name></field><field><column_name>line_id</column_name><stream_name>line_id</stream_name></field><field><column_name>kode_produk_sumber</column_name><stream_name>kode_produk_sumber</stream_name></field><field><column_name>waktu_transaksi_wib</column_name><stream_name>waktu_transaksi_wib</stream_name></field><field><column_name>metode_pembayaran</column_name><stream_name>metode_pembayaran</stream_name></field><field><column_name>qty</column_name><stream_name>qty</stream_name></field><field><column_name>harga_satuan_excl_ppn</column_name><stream_name>harga_satuan_excl_ppn</stream_name></field><field><column_name>penjualan_bruto</column_name><stream_name>penjualan_bruto</stream_name></field><field><column_name>diskon_rp</column_name><stream_name>diskon_rp</stream_name></field><field><column_name>penjualan_netto</column_name><stream_name>penjualan_netto</stream_name></field><field><column_name>hpp_satuan</column_name><stream_name>hpp_satuan</stream_name></field><field><column_name>hpp</column_name><stream_name>hpp</stream_name></field><field><column_name>fee_komisi</column_name><stream_name>fee_komisi</stream_name></field><field><column_name>fee_layanan</column_name><stream_name>fee_layanan</stream_name></field><field><column_name>margin_kotor</column_name><stream_name>margin_kotor</stream_name></field><field><column_name>qty_retur</column_name><stream_name>qty_retur</stream_name></field><field><column_name>nilai_retur</column_name><stream_name>nilai_retur</stream_name></field></fields>
+    <fields><field><column_name>id_tanggal</column_name><stream_name>id_tanggal</stream_name></field><field><column_name>id_produk</column_name><stream_name>id_produk</stream_name></field><field><column_name>id_pemasok</column_name><stream_name>id_pemasok</stream_name></field><field><column_name>id_kanal</column_name><stream_name>id_kanal</stream_name></field><field><column_name>id_pelanggan</column_name><stream_name>id_pelanggan</stream_name></field><field><column_name>id_kampanye</column_name><stream_name>id_kampanye</stream_name></field><field><column_name>sumber_sistem</column_name><stream_name>sumber_sistem</stream_name></field><field><column_name>nomor_transaksi</column_name><stream_name>nomor_transaksi</stream_name></field><field><column_name>line_id</column_name><stream_name>line_id</stream_name></field><field><column_name>kode_produk_sumber</column_name><stream_name>kode_produk_sumber</stream_name></field><field><column_name>waktu_transaksi_wib</column_name><stream_name>waktu_transaksi_wib</stream_name></field><field><column_name>metode_pembayaran</column_name><stream_name>metode_pembayaran</stream_name></field><field><column_name>qty</column_name><stream_name>qty</stream_name></field><field><column_name>harga_satuan_excl_ppn</column_name><stream_name>harga_satuan_excl_ppn</stream_name></field><field><column_name>penjualan_bruto</column_name><stream_name>penjualan_bruto</stream_name></field><field><column_name>diskon_rp</column_name><stream_name>diskon_rp</stream_name></field><field><column_name>penjualan_netto</column_name><stream_name>penjualan_netto</stream_name></field><field><column_name>hpp_satuan</column_name><stream_name>hpp_satuan</stream_name></field><field><column_name>hpp</column_name><stream_name>hpp</stream_name></field><field><column_name>fee_komisi</column_name><stream_name>fee_komisi</stream_name></field><field><column_name>fee_layanan</column_name><stream_name>fee_layanan</stream_name></field><field><column_name>margin_kotor</column_name><stream_name>margin_kotor</stream_name></field><field><column_name>qty_retur</column_name><stream_name>qty_retur</stream_name></field><field><column_name>nilai_retur</column_name><stream_name>nilai_retur</stream_name></field></fields>
     <attributes/>
     <cluster_schema/>
     <remotesteps>

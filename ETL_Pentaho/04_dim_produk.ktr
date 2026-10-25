@@ -101,11 +101,11 @@ Saat load fakta, harga pokok diambil dari versi dengan berlaku_sejak &lt;= tangg
     </hop>
     <hop>
       <from>Hitung berlaku_sampai &amp; is_current</from>
-      <to>Lookup pemasok_key</to>
+      <to>Lookup id_pemasok</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>Lookup pemasok_key</from>
+      <from>Lookup id_pemasok</from>
       <to>Tulis dim_produk</to>
       <enabled>Y</enabled>
     </hop>
@@ -367,7 +367,7 @@ function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd')
     </GUI>
   </step>
   <step>
-    <name>Lookup pemasok_key</name>
+    <name>Lookup id_pemasok</name>
     <type>DBLookup</type>
     <description/>
     <distribute>Y</distribute>
@@ -388,7 +388,7 @@ function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd')
       <fail_on_multiple>N</fail_on_multiple>
       <eat_row_on_failure>N</eat_row_on_failure>
       <key><name>nama_pemasok</name><field>nama_pemasok</field><condition>=</condition><name2/></key>
-      <value><name>pemasok_key</name><rename>pemasok_key</rename><default>-1</default><type>Integer</type></value>
+      <value><name>id_pemasok</name><rename>id_pemasok</rename><default>-1</default><type>Integer</type></value>
     </lookup>
     <attributes/>
     <cluster_schema/>
@@ -432,7 +432,7 @@ function dateKey(d) { return d == null ? null : parseInt(date2str(d, 'yyyyMMdd')
     <tablename_in_table>Y</tablename_in_table>
     <return_keys>N</return_keys>
     <return_field/>
-    <fields><field><column_name>material_no</column_name><stream_name>material_no_std</stream_name></field><field><column_name>nama_produk</column_name><stream_name>nama_produk_std</stream_name></field><field><column_name>merk</column_name><stream_name>merk</stream_name></field><field><column_name>kategori</column_name><stream_name>kategori_std</stream_name></field><field><column_name>sub_kategori</column_name><stream_name>sub_kategori_std</stream_name></field><field><column_name>harga_pokok</column_name><stream_name>harga_pokok</stream_name></field><field><column_name>status_produk</column_name><stream_name>status_produk</stream_name></field><field><column_name>pemasok_key</column_name><stream_name>pemasok_key</stream_name></field><field><column_name>nama_pemasok</column_name><stream_name>nama_pemasok</stream_name></field><field><column_name>versi</column_name><stream_name>versi</stream_name></field><field><column_name>berlaku_sejak</column_name><stream_name>berlaku_sejak</stream_name></field><field><column_name>berlaku_sampai</column_name><stream_name>berlaku_sampai</stream_name></field><field><column_name>is_current</column_name><stream_name>is_current</stream_name></field><field><column_name>is_inferred</column_name><stream_name>is_inferred</stream_name></field><field><column_name>sumber_data</column_name><stream_name>sumber_data</stream_name></field></fields>
+    <fields><field><column_name>material_no</column_name><stream_name>material_no_std</stream_name></field><field><column_name>nama_produk</column_name><stream_name>nama_produk_std</stream_name></field><field><column_name>merk</column_name><stream_name>merk</stream_name></field><field><column_name>kategori</column_name><stream_name>kategori_std</stream_name></field><field><column_name>sub_kategori</column_name><stream_name>sub_kategori_std</stream_name></field><field><column_name>harga_pokok</column_name><stream_name>harga_pokok</stream_name></field><field><column_name>status_produk</column_name><stream_name>status_produk</stream_name></field><field><column_name>id_pemasok</column_name><stream_name>id_pemasok</stream_name></field><field><column_name>nama_pemasok</column_name><stream_name>nama_pemasok</stream_name></field><field><column_name>versi</column_name><stream_name>versi</stream_name></field><field><column_name>berlaku_sejak</column_name><stream_name>berlaku_sejak</stream_name></field><field><column_name>berlaku_sampai</column_name><stream_name>berlaku_sampai</stream_name></field><field><column_name>is_current</column_name><stream_name>is_current</stream_name></field><field><column_name>is_inferred</column_name><stream_name>is_inferred</stream_name></field><field><column_name>sumber_data</column_name><stream_name>sumber_data</stream_name></field></fields>
     <attributes/>
     <cluster_schema/>
     <remotesteps>

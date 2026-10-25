@@ -22,9 +22,9 @@ WITH volume AS (
            SUM(CASE WHEN k.jenis_kanal = 'Toko Fisik'  THEN f.qty ELSE 0 END) AS qty_toko,
            SUM(CASE WHEN k.jenis_kanal = 'Situs Web'   THEN f.qty ELSE 0 END) AS qty_web
     FROM fact_penjualan f
-    JOIN dim_produk p ON p.produk_key = f.produk_key
-    JOIN dim_kanal  k ON k.kanal_key  = f.kanal_key
-    WHERE p.is_inferred = 0 AND p.produk_key > 0
+    JOIN dim_produk p ON p.id_produk = f.id_produk
+    JOIN dim_kanal  k ON k.id_kanal  = f.id_kanal
+    WHERE p.is_inferred = 0 AND p.id_produk > 0
     GROUP BY p.material_no, p.nama_produk, p.kategori, p.sub_kategori
 ),
 pangsa AS (
